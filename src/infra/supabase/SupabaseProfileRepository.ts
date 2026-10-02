@@ -2,11 +2,15 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
     Profile,
+    CreateProfileInput,
+    UpdateProfileInput,
     ProfileQuery,
     ProfileList,
     ProfileRepository,
     Role
 } from "../../domain/identity"
+
+import { ValidationError } from "@/src/errors";
 
 
 export class SupabaseProfileRepository
@@ -23,11 +27,32 @@ export class SupabaseProfileRepository
     }
 
     private buildQuery(query: ProfileQuery) {
+        function escapeSearchValue(value: string): string {
+            return value
+                .replace(/\\/g, "\\\\")
+                .replace(/"/g, '\\"')
+                .replace(/%/g, "\\%")
+                .replace(/_/g, "\\_");
+        }
+        
         let q = this.from()
             .select("*", { count: "exact" });
+        const search = query.search?.trim();
 
-        if (query.email?.length) {
-            q = q.in("email", query.email);
+        const MAX_SEARCH_LENGTH = 100;
+
+        if (search && search.length > MAX_SEARCH_LENGTH) {
+            throw new ValidationError("Search query is too long");
+        }
+
+        if (search) {
+            const value = escapeSearchValue(search);
+
+            q = q.or([
+                `email.ilike.*${value}*`,
+                `name.ilike.*${value}*`,
+                `class.ilike.*${value}*`,
+            ].join(","));
         }
 
         if (query.role?.length) {
@@ -40,20 +65,29 @@ export class SupabaseProfileRepository
 
         switch (query.sort) {
             case "class-asc":
-                q = q.order("class", { ascending: true });
+                q = q
+                    .order("class", { ascending: true })
+                    .order("email", { ascending: true });
                 break;
+
             case "class-desc":
-                q = q.order("class", { ascending: false });
+                q = q
+                    .order("class", { ascending: false })
+                    .order("email", { ascending: true });
                 break;
+
             case "email-asc":
                 q = q.order("email", { ascending: true });
                 break;
+
             case "email-desc":
                 q = q.order("email", { ascending: false });
                 break;
+
             case "newest":
                 q = q.order("created_at", { ascending: false });
                 break;
+
             case "oldest":
                 q = q.order("created_at", { ascending: true });
                 break;
@@ -145,7 +179,7 @@ export class SupabaseProfileRepository
         };
     }
 
-    async create(profile: Profile): Promise<void> {
+    async create(profile: CreateProfileInput): Promise<void> {
         const { error } = await this.from()
             .insert(profile);
 
@@ -164,10 +198,16 @@ export class SupabaseProfileRepository
         }
     }
 
-    async update(profile: Profile): Promise<void> {
+    async update(
+        email: string,
+        profile: UpdateProfileInput
+    ): Promise<void> {
         const { error } = await this.from()
-            .update(profile)
-            .eq("email", profile.email);
+            .update({
+                ...profile,
+                email: email
+            })
+            .eq("email", email);
 
         if (error) {
             throw error;

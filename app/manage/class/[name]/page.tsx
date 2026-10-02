@@ -2,8 +2,30 @@ import Link from "next/link";
 
 import { ClassHistoryTable } from "./component/ClassHistoryTable"
 
+import type { Metadata } from "next";
 
-export default async function ClassDetailPage({ params }: {params: Promise<{name: string;}>;}) {
+type Props = {
+  params: Promise<{ name: string }>;
+};
+
+// 使用 generateMetadata 動態生成 Metadata
+export async function generateMetadata(
+  { params }: Props,
+): Promise<Metadata> {
+  // 1. 等待解構 params
+  const { name } = await params;
+
+  // 2. 解碼網址參數（如果 name 包含中文或特殊字元）
+  const decodedName = decodeURIComponent(name);
+
+  // 3. 回傳動態設定的 metadata
+  return {
+    title: `${decodedName}班 - 管理後臺 - 學務處學生出缺勤回報系統`,
+    description: `生活輔導組及全校班級每日出缺勤填報 - ${decodedName}`,
+  };
+}
+
+export default async function ClassDetailPage({ params }: Props) {
   const { name } = await params
 
   return (
@@ -15,7 +37,7 @@ export default async function ClassDetailPage({ params }: {params: Promise<{name
             出缺勤總覽
           </Link>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="text-primary font-semibold">一年一班</span>
+          <span className="text-primary font-semibold">{name}</span>
         </nav>
       </div>
 
@@ -78,22 +100,7 @@ export default async function ClassDetailPage({ params }: {params: Promise<{name
       </div>
 
       {/* Roster & Attendance History Table */}
-      <div className="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden">
-        <div className="px-space-lg py-space-md bg-surface-container-low border-b border-outline-variant flex items-center justify-between">
-          <div className="flex items-center gap-space-sm">
-            <span className="material-symbols-outlined text-primary-container text-[20px]">
-              badge
-            </span>
-            <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-              {`班號`}出缺勤回報歷史紀錄
-            </h2>
-          </div>
-          <span className="font-label-sm text-label-sm text-on-surface-variant">
-            顯示 {`12`} 筆回報紀錄
-          </span>
-        </div>
-        <ClassHistoryTable classNo={name} />
-      </div>
+      <ClassHistoryTable classNo={name} />
     </div>
   );
 }

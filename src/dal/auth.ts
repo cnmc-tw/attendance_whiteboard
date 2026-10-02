@@ -3,7 +3,7 @@ import "server-only";
 import { createClient } from "@/utils/supabase/server";
 
 import type { Role } from "@/src/domain/identity";
-import { UnauthorizedError, ForbiddenError } from "./errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/errors";
 
 import { createContainer } from "../container";
 
@@ -23,7 +23,7 @@ export const requireUser = cache(async function requireUser() {
 
     const container = await createContainer();
 
-    const appUser = await container.profileRepository.getUserByEmail(user.email)
+    const appUser = await container.profileService.getUserByEmail(user.email)
 
     if (!appUser) {
         throw new ForbiddenError();

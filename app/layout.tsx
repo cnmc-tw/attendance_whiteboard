@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { plusJakartaSans, inter, notoSansTC } from "@/lib/font";
 import "./globals.css";
 
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 export const metadata: Metadata = {
-  title: "校園白板 - 出缺勤回報系統",
-  description: "生活輔導組及全校班級每日出缺勤填報與統計 Dashboard",
+  title: "學務處學生出缺勤回報系統",
+  description: "生活輔導組及全校班級每日出缺勤填報",
 };
 
 export default function RootLayout({
@@ -26,6 +29,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
+      <SpeedInsights />
+      <Analytics />
       <body className="min-h-full flex flex-col bg-surface font-body-md text-on-surface antialiased">
         {children}
       </body>

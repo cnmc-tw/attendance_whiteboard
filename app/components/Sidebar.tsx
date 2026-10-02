@@ -14,6 +14,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: "首頁", href: "/manage", icon: "home", exact: true },
   { name: "系統設定", href: "/manage/settings", icon: "settings" },
+  { name: "人員管理", href: "/manage/settings/users", icon: "manage_accounts" },
 ];
 
 export default function Sidebar() {

@@ -3,9 +3,7 @@ import { createContainer } from '@/src/container';
 
 import { requireInstructor } from '@/src/dal/auth';
 
-import { UnauthorizedError, ForbiddenError } from "@/src/dal/errors";
-
-import { ValidationError } from "@/src/domain/attendance"
+import { UnauthorizedError, ForbiddenError, ValidationError } from "@/src/errors";
 
 
 export async function GET(

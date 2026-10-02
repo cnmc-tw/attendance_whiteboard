@@ -10,31 +10,34 @@ export interface Profile {
     role: Role;
 
     class: string;
+}
 
-    created_at: string;
-    updated_at: string;
+export interface CreateProfileInput {
+    email: string;
+    name: string;
+    role: Role;
+    class: string | null;
+}
+
+export interface UpdateProfileInput {
+    name: string;
+    role: Role;
+    class: string | null;
 }
 
 export type Role =
-    | ''
     | 'monitor'
     | 'instructor'
     | 'supervisor'
 
 export interface ProfileQuery {
-    email?: string[];
-
+    search?: string;
     role?: Role[];
-
     class?: string[];
-
     sort?: ProfileSort;
-
     page: number;
-
     pageSize: number;
 }
-
 
 export type ProfileSort =
     | "class-asc"

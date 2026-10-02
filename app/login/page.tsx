@@ -8,7 +8,6 @@ import { redirect } from "next/navigation";
 export const metadata = {
     title: "登入 - 學務處學生缺曠回報",
     description: "登入學生缺曠記錄",
-    
 };
 
 type PageProps = {

@@ -685,6 +685,8 @@ BEGIN
 END;
 $function$;
 
+DROP EVENT TRIGGER IF EXISTS "ensure_rls";
+
 CREATE OR REPLACE FUNCTION public.rls_auto_enable()
   RETURNS event_trigger
   LANGUAGE plpgsql

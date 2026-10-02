@@ -1,5 +1,7 @@
 'use client'
 
+import { FormInputField } from "./FormsInputField";
+
 import { setSettings } from "@/app/actions"
 import { SystemConfig } from "@/src/domain/system";
 
@@ -11,13 +13,12 @@ export function SettingForms({config} : {config: SystemConfig}) {
     const {
         register,
         handleSubmit,
-        formState: {errors, isSubmitting, isSubmitSuccessful}
+        formState: {errors, isSubmitting}
     } = useForm<SystemConfig>({
         defaultValues: config,
     });
 
     const onSubmit: SubmitHandler<SystemConfig> = async (data) => {
-        console.log("submitting")
         await setSettings(data)
     }
 
@@ -30,98 +31,76 @@ export function SettingForms({config} : {config: SystemConfig}) {
                 className="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col gap-space-lg relative overflow-hidden border border-outline-variant"
             >
                 <div className="flex items-center gap-space-sm border-b border-outline-variant pb-space-md">
-                <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container">
+                    <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-primary-container">
                     <span
-                    className="material-symbols-outlined text-[24px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
+                        className="material-symbols-outlined text-[24px]"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
                     >
-                    timer
+                        timer
                     </span>
-                </div>
-                <div>
+                    </div>
+                    <div>
                     <h2 className="font-headline-md text-headline-md text-primary tracking-tight font-bold">
-                    回報時段與規則設定
+                        回報時段與規則設定
                     </h2>
                     <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    設定風紀股長每日常態登記與開放填報的時間區間
+                        設定風紀股長每日常態登記與開放填報的時間區間
                     </p>
-                </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>回報開始時間</span>
-                        </label>
-                        <input
-                        type="text"
-                        {...register("report.report_start_time", {
+                    {/* 回報開始時間 */}
+                    <FormInputField
+                        label="回報開始時間"
+                        registration={register("report.report_start_time", {
                             required: '請輸入回報開始時間',
                             pattern: {
-                                value: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
-                                message: '請輸入正確時間格式(hh:mm:ss)'
+                            value: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+                            message: '請輸入正確時間格式(hh:mm:ss)'
                             }
                         })}
-                        className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.report?.report_start_time?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.report.report_start_time.message}</p>
-                        )}
-                    </div>
+                        error={errors.report?.report_start_time}
+                    />
 
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>回報結束時間</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register("report.report_end_time", {
-                                required: '請輸入回報結束時間',
-                                pattern: {
-                                    value: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
-                                    message: '請輸入正確時間格式(hh:mm:ss)'
-                                },
-                                validate: (endTime, formValues) => {
-                                    const startTime = formValues.report?.report_start_time;
-                                    if (startTime && /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(startTime)) {
-                                        if (endTime <= startTime) return '結束時間必須晚於開始時間';
-                                    }
-                                    return true;
-                                }
-                            })}
-                            className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.report?.report_end_time?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.report.report_end_time.message}</p>
-                        )}
-                    </div>
+                    {/* 回報結束時間 */}
+                    <FormInputField
+                        label="回報結束時間"
+                        registration={register("report.report_end_time", {
+                            required: '請輸入回報結束時間',
+                            pattern: {
+                            value: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+                            message: '請輸入正確時間格式(hh:mm:ss)'
+                            },
+                            validate: (endTime, formValues) => {
+                            const startTime = formValues.report?.report_start_time;
+                            if (startTime && /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(startTime)) {
+                                if (endTime <= startTime) return '結束時間必須晚於開始時間';
+                            }
+                            return true;
+                            }
+                        })}
+                        error={errors.report?.report_end_time}
+                    />
 
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>回報冷卻時間</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register("report.report_cooldown_seconds", {
-                                required: '請輸入回報冷卻時間',
-                                pattern: {
-                                    value: /^\d+$/, // 確保輸入值全為數字
-                                    message: '請輸入有效的秒數（正整數）'
-                                },
-                                validate: (value) => {
-                                    const num = Number(value);
-                                    if (num > 999) return '數字過大';
-                                    if (num < 0) return '秒數不能為負數';
-                                    return true;
-                                }
-                            })}
-                            className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.report?.report_cooldown_seconds?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.report.report_cooldown_seconds.message}</p>
-                        )}
-                    </div>
-                    
+                    {/* 回報冷卻時間 */}
+                    <FormInputField
+                        label="回報冷卻時間"
+                        registration={register("report.report_cooldown_seconds", {
+                            required: '請輸入回報冷卻時間',
+                            pattern: {
+                                value: /^\d+$/,
+                                message: '請輸入有效的秒數（正整數）'
+                            },
+                            validate: (value) => {
+                                const num = Number(value);
+                                if (num > 999) return '數字過大';
+                                if (num < 0) return '秒數不能為負數';
+                                return true;
+                            }
+                        })}
+                        error={errors.report?.report_cooldown_seconds}
+                    />
                 </div>
             </section>
 
@@ -146,32 +125,20 @@ export function SettingForms({config} : {config: SystemConfig}) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md font-body-md">
-                <div className="flex flex-col gap-1">
-                    <label className="font-label-md font-semibold text-on-surface">
-                    學期開始日期
-                    </label>
-                    <input
-                        type="text"
-                        {...register("report.semester_start", {
-                            required: '請輸入學期開始日期',
-                            pattern: {
-                                value: /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/,
-                                message: '請輸入正確日期格式(yyyy-mm-dd)'
-                            }
-                        })}
-                        className="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant/40"
+                    <FormInputField
+                        label="學期開始日期"
+                        registration={register("report.semester_start", {
+                                required: '請輸入學期開始日期',
+                                pattern: {
+                                    value: /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/,
+                                    message: '請輸入正確日期格式(yyyy-mm-dd)'
+                                }
+                            })}
+                        error={errors.report?.semester_start}
                     />
-                    {errors.report?.semester_start?.message && (
-                        <p className="text-red-500 text-xs mt-1">{errors.report.semester_start.message}</p>
-                    )}
-                </div>
-                <div className="flex flex-col gap-1">
-                    <label className="font-label-md font-semibold text-on-surface">
-                    學期結束日期
-                    </label>
-                    <input
-                        type="text"
-                        {...register("report.semester_end", {
+                    <FormInputField
+                        label="學期結束日期"
+                        registration={register("report.semester_end", {
                             required: '請輸入學期結束日期',
                             pattern: {
                                 value: /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/,
@@ -181,21 +148,16 @@ export function SettingForms({config} : {config: SystemConfig}) {
                                 const startDate = formValues.report?.semester_start;
                                 const dateRegex = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
 
-                                // 確保開始日期存在且格式正確才進行比較
                                 if (startDate && dateRegex.test(startDate)) {
                                     if (endDate <= startDate) {
-                                    return '學期結束日期必須晚於開始日期';
+                                        return '學期結束日期必須晚於開始日期';
                                     }
                                 }
                                 return true;
                             }
                         })}
-                        className="bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant/40"
+                        error={errors.report?.semester_end}
                     />
-                    {errors.report?.semester_end?.message && (
-                        <p className="text-red-500 text-xs mt-1">{errors.report.semester_end.message}</p>
-                    )}
-                </div>
                 </div>
             </section>
 
@@ -221,65 +183,41 @@ export function SettingForms({config} : {config: SystemConfig}) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>基準年(西元)</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register("classNumbering.baseYear", {
-                                required: '請輸入基準年',
-                                pattern: {
-                                    value: /^\d+$/,
-                                    message: '請輸入正確西元年'
-                                }
-                            })}
-                            className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.classNumbering?.baseYear?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.classNumbering.baseYear.message}</p>
-                        )}
-                    </div>
+                    <FormInputField
+                        label="基準年(西元)"
+                        registration={register("classNumbering.baseYear", {
+                            required: '請輸入基準年',
+                            pattern: {
+                                value: /^\d+$/,
+                                message: '請輸入正確西元年'
+                            }
+                        })}
+                        error={errors.classNumbering?.baseYear}
+                    />
 
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>起始班號</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register("classNumbering.baseClass", {
-                                required: '請輸入起始班號',
-                                pattern: {
-                                    value: /^\d+$/,
-                                    message: '請輸入正確班號'
-                                }
-                            })}
-                            className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.classNumbering?.baseClass?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.classNumbering.baseClass.message}</p>
-                        )}
-                    </div>
+                    <FormInputField
+                        label="起始班號"
+                        registration={register("classNumbering.baseClass", {
+                            required: '請輸入起始班號',
+                            pattern: {
+                                value: /^\d+$/,
+                                message: '請輸入正確班號'
+                            }
+                        })}
+                        error={errors.classNumbering?.baseClass}
+                    />
 
-                    <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs border border-outline-variant/30">
-                        <label className="font-label-lg text-label-lg font-semibold text-on-surface flex items-center justify-between">
-                        <span>年班間隔</span>
-                        </label>
-                        <input
-                            type="text"
-                            {...register("classNumbering.classesPerGrade", {
-                                required: '請輸入年班間隔',
-                                pattern: {
-                                    value: /^\d+$/, // 確保輸入值全為數字
-                                    message: '請輸入有效間隔'
-                                }
-                            })}
-                            className="w-full bg-surface-container-lowest text-primary font-numeric-data text-headline-sm px-space-md py-space-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-container border border-outline-variant/40 mt-1"
-                        />
-                        {errors.classNumbering?.classesPerGrade?.message && (
-                            <p className="text-red-500 text-xs mt-1">{errors.classNumbering?.classesPerGrade.message}</p>
-                        )}
-                    </div>
+                    <FormInputField
+                        label="年班間隔"
+                        registration={register("classNumbering.classesPerGrade", {
+                            required: '請輸入年班間隔',
+                            pattern: {
+                                value: /^\d+$/,
+                                message: '請輸入有效間隔'
+                            }
+                        })}
+                        error={errors.classNumbering?.classesPerGrade}
+                    />
                     
                 </div>
                 <span className="text-red-500 text-xl text-center">
