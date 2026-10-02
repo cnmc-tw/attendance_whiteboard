@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { plusJakartaSans, inter, notoSansTC } from "@/lib/font";
+import { ibmPlexSans, inter, notoSansTC } from "@/lib/font";
 import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/next"
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html
       lang="zh-Hant"
-      className={`${plusJakartaSans.variable} ${inter.variable} ${notoSansTC.variable} h-full antialiased`}
+      className={`${ibmPlexSans.variable} ${inter.variable} ${notoSansTC.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
