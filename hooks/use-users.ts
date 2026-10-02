@@ -144,7 +144,7 @@ export function useUsers(query: UsersQuery) {
 
                 if (!response.ok || !result.success) {
                     throw new UsersRequestError(
-                        parseUsersError(response, result)
+                        parseUsersError(response) //, result)
                     );
                 }
 
