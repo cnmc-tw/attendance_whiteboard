@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
     if (!config.data || config.error) return;
 
-    let data: MetricsData = {
+    const data: MetricsData = {
         classcount: +config!.data.classesPerGrade * 3,
         reportedClass: 0,
 

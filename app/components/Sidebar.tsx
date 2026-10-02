@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import Image from "next/image";
+
 import { SignOutButton } from "./ui";
 
 interface NavItem {
@@ -23,8 +25,10 @@ export default function Sidebar() {
     <div className="flex flex-col">
       {/* Brand Header */}
       <div className="h-32 px-space-lg flex items-center gap-space-sm border-b border-outline-variant bg-surface-container-lowest">
-        <img
+        <Image
           src="/logo.png"
+          alt="hsnu logo"
+          unoptimized
           className="w-16 h-16 rounded-lg"
         />
         <div className="flex flex-col">

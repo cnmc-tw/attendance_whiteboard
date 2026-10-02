@@ -44,7 +44,7 @@ export default async function DashboardPage({ params }: Props) {
 
     if (!config.data) return;
 
-    let data: MetricsData = {
+    const data: MetricsData = {
         classcount: +config.data.classesPerGrade * 3,
         reportedClass: 0,
 

@@ -28,6 +28,19 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
         { success: false, } // 初始 state
     );
 
+    function getRemainingCooldown(
+        submittedAt: Date,
+        cooldownSeconds: number,
+    ): number {
+        const elapsed =
+            (Date.now() - submittedAt.getTime()) / 1000;
+
+        return Math.max(
+            0,
+            Math.ceil(cooldownSeconds - elapsed),
+        );
+    }
+
 
     useEffect(() => {
         const update = () => {
@@ -44,7 +57,7 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
         const timer = setInterval(update, 1000);
 
         return () => clearInterval(timer);
-    }, [cooldown_seconds]);
+    }, [cooldown_seconds, submittedAt]);
 
 
     const errorMessages: Record<string, string> = {
@@ -68,19 +81,6 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
         label: String(i + 1),
         value: String(i + 1)
     }));
-
-    function getRemainingCooldown(
-        submittedAt: Date,
-        cooldownSeconds: number,
-    ): number {
-        const elapsed =
-            (Date.now() - submittedAt.getTime()) / 1000;
-
-        return Math.max(
-            0,
-            Math.ceil(cooldownSeconds - elapsed),
-        );
-    }
 
     function findOptions(selectedCategory: string): { label: string; value: string }[] {
         // 1. 收集「所有假別」已經選取的數字 (將多個子集合併成 Set)
