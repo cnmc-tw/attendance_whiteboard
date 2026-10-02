@@ -34,7 +34,7 @@ class DefaultSessionService implements SessionService {
         if (profile.auth_user_id !== user.id) {
             profile.auth_user_id = user.id;
             profile.name = user.user_metadata?.full_name;
-            await this.profileRepository.update(profile);
+            await this.profileRepository.update(user.email, profile);
         }
     }
 

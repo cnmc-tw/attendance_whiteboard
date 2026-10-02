@@ -2,35 +2,10 @@
 
 import { useClassHistory } from "@/hooks/use-class-history";
 
-type Report = {
-    id: string;
-    class: string;
-    report_date: string;
-    submitted_by: string;
-    submitted_at: string;
-    payload: Record<string, number[]>;
-};
-
 type ClassHistoryTableProps = {
     classNo: string;
 };
 
-const leaveTypeLabels: Record<string, string> = {
-    sick: "病假",
-    personal: "事假",
-    official: "公假",
-    other: "其他",
-};
-
-function getSummary(payload: Report["payload"]) {
-    return Object.entries(payload)
-        .map(([type, students]) => {
-            const label = leaveTypeLabels[type] ?? type;
-
-            return `${label} ${students.length}`;
-        })
-        .join("、");
-}
 
 function formatDate(date: string) {
     const value = new Date(`${date}T00:00:00`);
@@ -96,18 +71,22 @@ export function ClassHistoryTable({
         );
     }
 
+
+  
     return (
         <div className="overflow-hidden rounded-3xl bg-surface-container-lowest shadow-sm ring-1 ring-outline-variant/70">
-            <div className="flex items-center justify-between bg-surface-container-low px-6 py-5">
-                <div>
-                    <h2 className="text-lg font-semibold tracking-tight text-on-surface">
-                        {classNo} 班
+            <div className="px-space-lg py-space-md bg-surface-container-low border-b border-outline-variant flex items-center justify-between">
+                <div className="flex items-center gap-space-sm">
+                    <span className="material-symbols-outlined text-primary-container text-[20px]">
+                    badge
+                    </span>
+                    <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
+                        {classNo}班出缺勤回報歷史紀錄
                     </h2>
-
-                    <p className="mt-1 text-sm text-on-surface-variant">
-                        歷史回報
-                    </p>
                 </div>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    顯示 {items.length} 筆回報紀錄
+                </span>
             </div>
 
             {items.length === 0 ? (
@@ -119,7 +98,7 @@ export function ClassHistoryTable({
             ) : (
                 <>
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[680px] border-collapse">
+                        <table className="w-full min-w-170 border-collapse">
                             <thead>
                                 <tr className="bg-surface-container">
                                     <th
@@ -168,9 +147,13 @@ export function ClassHistoryTable({
 
                                         <td className="px-6 py-4">
                                             <span className="text-sm text-on-surface-variant">
-                                                {getSummary(
-                                                    report.payload,
-                                                )}
+                                                {report.sick > 0 && (<span className="text-rose-500 font-bold">病 {report.sick} </span>)}
+                                                {report.personal > 0 && (<span className="text-yellow-600 font-bold">事 {report.personal} </span>)}
+                                                {report.official > 0 && (<span className="text-lime-600 font-bold">公 {report.official} </span>)}
+                                                {report.other > 0 && (<span className="text-red-600 font-bold">曠 {report.other} </span>)}
+                                                {report.absentCount > 0 && (<span className="text-on-surface-variant font-bold">共 {report.absentCount} 人</span>)}
+                                                {report.absentCount === 0 && (<span className="text-green-400 font-bold">全員到齊</span>)}
+                                                {report.absentCount === -1 && (<span className="text-outline italic">尚未填報</span>)}
                                             </span>
                                         </td>
 

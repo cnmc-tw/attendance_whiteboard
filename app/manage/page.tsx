@@ -4,6 +4,13 @@ import { getClassNumberingConfig, getReportsByDate } from "../actions";
 
 import { ReportItem } from "@/src/domain/attendance";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "本日回報 - 學務處學生出缺勤回報系統",
+  description: "生活輔導組及全校班級每日出缺勤填報",
+};
+
 export default async function DashboardPage() {
     const [config, reports] = await Promise.all([
         getClassNumberingConfig(),
@@ -13,7 +20,7 @@ export default async function DashboardPage() {
     if (!config.data || config.error) return;
 
     let data: MetricsData = {
-        classcount: config!.data.classesPerGrade * 3,
+        classcount: +config!.data.classesPerGrade * 3,
         reportedClass: 0,
 
         notReportedGrade1: [],
@@ -32,17 +39,17 @@ export default async function DashboardPage() {
     const reportsMap = new Map(reports.data.map((report) => [report.class, report]))
         
     const yearBaseClass =
-        config.data.baseClass +
+        +config.data.baseClass +
         (new Date().getFullYear() - 
-        config.data.baseYear - 1) * 
-        config.data.classesPerGrade;
+        +config.data.baseYear - 1) * 
+        +config.data.classesPerGrade;
 
     function getGrade(
         classNo: number,
     ) {
 
         const offset =
-            classNo - yearBaseClass;
+            classNo - +yearBaseClass;
 
         if (
             offset < 0 ||
@@ -51,10 +58,10 @@ export default async function DashboardPage() {
             return 0;
         }
 
-        return 3 - Math.floor(offset / config.data!.classesPerGrade);
+        return 3 - Math.floor(offset / +config.data!.classesPerGrade);
     }
 
-    const allClass =  Array.from({ length: 3 * config.data.classesPerGrade }, (_, i) => {
+    const allClass =  Array.from({ length: 3 * +config.data.classesPerGrade }, (_, i) => {
         return String(yearBaseClass + i)
     });
 

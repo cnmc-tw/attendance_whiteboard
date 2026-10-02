@@ -3,11 +3,11 @@
 
 import { createContainer } from '@/src/container';
 
-import { ReportSubmissionError, ReportItem } from '@/src/domain/attendance';
+import { ReportItem } from '@/src/domain/attendance';
 
 import { requireUser } from '@/src/dal/auth';
 
-import { UnauthorizedError, ForbiddenError } from "@/src/dal/errors";
+import {ReportSubmissionError, UnauthorizedError, ForbiddenError } from "@/src/errors";
 
 export type ReportResponse =
     | {

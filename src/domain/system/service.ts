@@ -18,9 +18,9 @@ export type ReportConfig = {
 
 
 export type ClassNumberingConfig = {
-    baseYear: number;
-    baseClass: number;
-    classesPerGrade: number;
+    baseYear: string;
+    baseClass: string;
+    classesPerGrade: string;
 };
 
 export type SystemConfig = {
@@ -95,9 +95,9 @@ implements SystemService {
 
 
         const config: ClassNumberingConfig = {
-            baseYear: parseInt(settingsMap.get("base_year") || "0", 10),
-            baseClass: parseInt(settingsMap.get("base_class") || "0", 10),
-            classesPerGrade: parseInt(settingsMap.get("classes_per_grade") || "0", 10),
+            baseYear: settingsMap.get("base_year") || "0",
+            baseClass: settingsMap.get("base_class") || "0",
+            classesPerGrade: settingsMap.get("classes_per_grade") || "0",
         };
 
         return config;
@@ -130,11 +130,11 @@ implements SystemService {
 
             classNumbering: {
                 baseYear:
-                    Number(map.get("base_year")),
+                    map.get("base_year")!,
                 baseClass:
-                    Number(map.get("base_class")),
+                    map.get("base_class")!,
                 classesPerGrade:
-                    Number(map.get("class_per_grade")),
+                    map.get("classes_per_grade")!,
             }
         };
     }

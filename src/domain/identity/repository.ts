@@ -1,4 +1,4 @@
-import { Profile, ProfileQuery, ProfileList, Role } from "./types";
+import { Profile, CreateProfileInput, UpdateProfileInput, ProfileQuery, ProfileList, Role } from "./types";
 
 
 export interface ProfileRepository {
@@ -13,11 +13,14 @@ export interface ProfileRepository {
 
     find(query: ProfileQuery): Promise<ProfileList>;
 
-    create(profile: Profile): Promise<void>;
+    create(profile: CreateProfileInput): Promise<void>;
 
-    createMany(profiles: Profile[]): Promise<void>;
+    createMany(profiles: CreateProfileInput[]): Promise<void>;
 
-    update(profile: Profile): Promise<void>;
+    update(
+        email: string,
+        profile: UpdateProfileInput
+    ): Promise<void>;
 
     delete(email: string): Promise<void>;
 

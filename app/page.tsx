@@ -1,24 +1,44 @@
-import { redirect } from "next/navigation";
-
+import { redirect, forbidden } from "next/navigation";
 import { getReportConfig } from "./actions";
 
 import { requireUser } from "@/src/dal/auth";
+import { UnauthorizedError, ForbiddenError } from "@/src/errors";
 
 import { SignOutButton } from "./components/ui";
 
 import { ReportCard } from "./components/ReportCard";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "每日回報 - 學務處學生出缺勤回報系統",
+  description: "生活輔導組及全校班級每日出缺勤填報",
+};
+
 export default async function DailyReportPage() {
 
-  const user = await requireUser()
+  let usr
 
-  if (!!!user) redirect("/login");
+  try {
+    const user = await requireUser()
+    if (user.role !== "monitor") redirect('/manage');
+    usr = user
+  } catch(error) {
 
-  if (user.role === "instructor" || user.role === "supervisor") redirect('/manage');
+      if (error instanceof UnauthorizedError) {
+        redirect("/login");
+      }
+
+      if (error instanceof ForbiddenError) {
+        forbidden();
+      }
+  
+      throw error;
+  }
+
+  
 
   const config = await getReportConfig()
-
-  if (!config.data || config.error) return;
 
   type ReportAvailability = {
       allowed: boolean;
@@ -29,7 +49,12 @@ export default async function DailyReportPage() {
     const now = new Date()
     const date = now.toLocaleDateString('en-CA')
 
-    if (!config) return { allowed: false };
+    if (!config.data) {
+      return {
+        allowed: false,
+        message:`系統尚未啟用`
+      }
+    }
 
     if (date < config.data!.semester_start) {
       return {
@@ -99,7 +124,7 @@ export default async function DailyReportPage() {
                   學務處學生缺曠回報
                 </h1>
                 <p className="text-on-surface-variant text-2xl">
-                  {user.class}班  
+                  {usr.class}班  
                 </p>
             </div>
 
@@ -107,7 +132,7 @@ export default async function DailyReportPage() {
               {allow.message}
             </h1>)}
             
-            {allow.allowed && (<ReportCard cooldown_seconds={config.data.report_cooldown_seconds} />)}
+            {allow.allowed && (<ReportCard cooldown_seconds={config.data!.report_cooldown_seconds} />)}
             
             <div className="flex justify-center">
               <SignOutButton />

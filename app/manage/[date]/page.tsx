@@ -6,8 +6,31 @@ import { getClassNumberingConfig, getReportsByDate } from "../../actions";
 
 import { ReportItem } from "@/src/domain/attendance";
 
+import type { Metadata } from "next";
 
-export default async function DashboardPage({ params }: {params: Promise<{date: string;}>;}) {
+type Props = {
+  params: Promise<{ date: string }>;
+};
+
+// 使用 generateMetadata 動態生成 Metadata
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  // 1. 等待解構 params
+  const { date } = await params;
+
+  // 2. 解碼網址參數（如果 name 包含中文或特殊字元）
+  const decodedName = decodeURIComponent(date);
+
+  // 3. 回傳動態設定的 metadata
+  return {
+    title: `${decodedName} - 管理後臺 - 學務處學生出缺勤回報系統`,
+    description: `生活輔導組及全校班級每日出缺勤填報 - ${decodedName}`,
+  };
+}
+
+
+export default async function DashboardPage({ params }: Props) {
     const { date } = await params
 
     const today = new Date(date)
@@ -22,7 +45,7 @@ export default async function DashboardPage({ params }: {params: Promise<{date: 
     if (!config.data) return;
 
     let data: MetricsData = {
-        classcount: config.data.classesPerGrade * 3,
+        classcount: +config.data.classesPerGrade * 3,
         reportedClass: 0,
 
         notReportedGrade1: [],
@@ -39,17 +62,17 @@ export default async function DashboardPage({ params }: {params: Promise<{date: 
     const reportsMap = new Map(reports.data!.map((report) => [report.class, report]))
         
     const yearBaseClass =
-        config.data.baseClass +
+        +config.data.baseClass +
         (new Date().getFullYear() - 
-        config.data.baseYear - 1) * 
-        config.data.classesPerGrade;
+        +config.data.baseYear - 1) * 
+        +config.data.classesPerGrade;
 
     function getGrade(
         classNo: number,
     ) {
 
         const offset =
-            classNo - yearBaseClass;
+            classNo - +yearBaseClass;
 
         if (
             offset < 0 ||
@@ -58,10 +81,10 @@ export default async function DashboardPage({ params }: {params: Promise<{date: 
             return 0;
         }
 
-        return 3 - Math.floor(offset / config.data!.classesPerGrade);
+        return 3 - Math.floor(offset / +config.data!.classesPerGrade);
     }
 
-    const allClass =  Array.from({ length: 3 * config.data.classesPerGrade }, (_, i) => {
+    const allClass =  Array.from({ length: 3 * +config.data.classesPerGrade }, (_, i) => {
         return String(yearBaseClass + i)
     });
 

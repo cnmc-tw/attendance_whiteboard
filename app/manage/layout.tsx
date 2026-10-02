@@ -5,9 +5,17 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 import { requireInstructor } from "@/src/dal/auth";
-import { UnauthorizedError, ForbiddenError } from "@/src/dal/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/errors";
 
-import {  forbidden, unauthorized } from "next/navigation";
+import { forbidden, unauthorized } from "next/navigation";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "管理後臺 - 學務處學生出缺勤回報系統",
+  description: "生活輔導組及全校班級每日出缺勤填報",
+};
+
 
 export default async function DashboardLayout({
   children,

@@ -1,6 +1,6 @@
 import { ReportRepository } from "./repository";
 import { Report, GetClassHistoryQuery, ClassHistoryResult } from "./types";
-import { ValidationError } from "./error"
+import { ValidationError } from "@/src/errors";
 
 export interface ReportItem {
     id: string;

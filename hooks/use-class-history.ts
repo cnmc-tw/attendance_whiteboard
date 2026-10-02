@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Report } from "../src/domain/attendance";
+import { ReportItem, Report } from "../src/domain/attendance";
 
 type ClassHistoryResponse = {
     items: Report[];
@@ -11,7 +11,7 @@ type ClassHistoryResponse = {
 };
 
 type UseClassHistoryResult = {
-    items: Report[];
+    items: ReportItem[];
     isLoading: boolean;
     isLoadingMore: boolean;
     error: Error | null;
@@ -19,10 +19,31 @@ type UseClassHistoryResult = {
     loadMore: () => Promise<void>;
 };
 
+function toReportItem(report: Report): ReportItem {
+    return {
+        id: report.id,
+        class: report.class,
+        grade: 0,
+
+        sick: report.payload.sick?.length ?? 0,
+        personal: report.payload.personal?.length ?? 0,
+        official: report.payload.official?.length ?? 0,
+        other: report.payload.other?.length ?? 0,
+
+        absentCount: Object.values(report.payload)
+            .reduce((acc, arr) => acc + arr.length, 0),
+
+        status: "reported",
+        report_date: report.report_date,
+        submitted_by: report.submitted_by,
+        submitted_at: report.submitted_at,
+    }
+}
+
 export function useClassHistory(
     classNo: string,
 ): UseClassHistoryResult {
-    const [items, setItems] = useState<Report[]>([]);
+    const [items, setItems] = useState<ReportItem[]>([]);
     const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [hasMore, setHasMore] = useState(true);
 
@@ -77,7 +98,7 @@ export function useClassHistory(
                     return;
                 }
 
-                setItems(data.items);
+                setItems(data.items.map(toReportItem));
                 setNextCursor(data.nextCursor);
                 setHasMore(data.hasMore);
             } catch (error) {
@@ -124,7 +145,7 @@ export function useClassHistory(
 
             setItems((current) => [
                 ...current,
-                ...data.items,
+                ...data.items.map(toReportItem),
             ]);
 
             setNextCursor(data.nextCursor);

@@ -4,10 +4,10 @@ import {
     ReportRepository,
     Report,
     GetClassHistoryQuery,
-    ClassHistoryResult,
-    ReportSubmissionErrorCode,
-    ReportSubmissionError
+    ClassHistoryResult
 } from "../../domain/attendance";
+
+import { ReportSubmissionError, ReportSubmissionErrorCode } from "@/src/errors";
 
 export class SupabaseReportRepository 
     implements ReportRepository {

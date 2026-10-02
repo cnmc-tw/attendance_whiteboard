@@ -4,7 +4,7 @@
 import { createContainer } from '@/src/container';
 
 import { SystemConfig, ReportConfig, ClassNumberingConfig } from '@/src/domain/system/';
-import { UnauthorizedError, ForbiddenError } from "@/src/dal/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/errors";
 import { requireSupervisor, requireUser } from "@/src/dal/auth";
 
 

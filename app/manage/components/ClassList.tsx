@@ -94,7 +94,7 @@ export function ClassTable({
                         <tr
                             key={report.class}
                             onClick={() => router.push(`/manage/class/${report.class}`)}
-                            className="hover:bg-surface-container/50 transition-colors"
+                            className="hover:bg-surface-container/50 transition-colors hover:cursor-pointer"
                         >
                         <td className="py-3.5 px-3 md:px-space-lg font-semibold text-on-surface whitespace-nowrap">
                             {report.class}
