@@ -1,5 +1,3 @@
-import { ReportItem } from "@/src/domain/attendance"
-
 export interface MetricsData {
 
     classcount: number

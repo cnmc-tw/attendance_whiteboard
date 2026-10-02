@@ -34,7 +34,7 @@ export function AddEditUserModal ({
 
     useEffect(() => {
         reset(userToEdit ?? emptyProfile);
-    }, [userToEdit, isOpen, reset]);
+    }, [userToEdit, isOpen, reset, emptyProfile]);
 
     if (!isOpen) return null;
 
