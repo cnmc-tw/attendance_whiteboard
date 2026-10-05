@@ -7,7 +7,7 @@ import {
     ClassHistoryResult
 } from "../../domain/attendance";
 
-import { ReportSubmissionError, ReportSubmissionErrorCode } from "@/src/errors";
+import { ReportSubmissionError, ReportSubmissionErrorCode } from "@/src/application/errors";
 
 export class SupabaseReportRepository 
     implements ReportRepository {

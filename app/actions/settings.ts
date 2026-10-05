@@ -4,7 +4,7 @@
 import { createContainer } from '@/src/container';
 
 import { SystemConfig, ReportConfig, ClassNumberingConfig } from '@/src/domain/system/';
-import { UnauthorizedError, ForbiddenError } from "@/src/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 import { requireSupervisor, requireUser } from "@/src/dal/auth";
 
 
@@ -109,7 +109,7 @@ export type UpdateSettingsState =
         error?: string;
       };
 
-export async function setSettings(setting: SystemConfig ): Promise<UpdateSettingsState> {
+export async function setSettings(setting: SystemConfig): Promise<UpdateSettingsState> {
     
     try {
         await requireSupervisor();

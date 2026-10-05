@@ -2,7 +2,7 @@ import { redirect, forbidden } from "next/navigation";
 import { getReportConfig } from "./actions";
 
 import { requireUser } from "@/src/dal/auth";
-import { UnauthorizedError, ForbiddenError } from "@/src/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 
 import { SignOutButton } from "./components/ui";
 

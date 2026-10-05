@@ -5,7 +5,7 @@ import { requireInstructor } from '@/src/dal/auth';
 
 import { Role, ProfileQuery, ProfileSort } from '@/src/domain/identity';
 
-import { UnauthorizedError, ForbiddenError, ValidationError } from "@/src/errors";
+import { UnauthorizedError, ForbiddenError, ValidationError } from "@/src/application/errors";
 import { NextRequest, NextResponse } from 'next/server';
 
 import { checkUserRateLimit, RateLimitError } from '@/utils/upstash/redis';

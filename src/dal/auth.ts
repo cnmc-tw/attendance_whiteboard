@@ -3,7 +3,7 @@ import "server-only";
 import { createClient } from "@/utils/supabase/server";
 
 import type { Role } from "@/src/domain/identity";
-import { UnauthorizedError, ForbiddenError } from "@/src/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 
 import { createContainer } from "../container";
 

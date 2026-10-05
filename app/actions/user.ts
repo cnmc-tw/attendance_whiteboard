@@ -1,46 +1,38 @@
 "use server";
 
-import { requireSupervisor } from "@/src/dal/auth";
-
 import { createContainer } from "@/src/container";
-
-import { CreateProfileInput, UpdateProfileInput } from "@/src/domain/identity";
-
-type ActionResult<T = void> =
-    | {
-        success: true;
-        data: T;
-    }
-    | {
-        success: false;
-        error: "VALIDATION_ERROR"
-            | "DUPLICATE_EMAIL"
-            | "NOT_FOUND"
-            | "FORBIDDEN"
-            | "UNKNOWN";
-    };
+import { requireSupervisor } from "@/src/dal/auth";
+import { executeAction } from "@/src/application/actions/execute-action";
+import type { ActionResult } from "@/src/application/actions/action-result";
+import type {
+    CreateProfileInput,
+    UpdateProfileInput,
+} from "@/src/domain/identity";
 
 export async function createUser(
     input: CreateProfileInput,
-) {
-    await requireSupervisor();
+): Promise<ActionResult<void>> {
+    return executeAction(async () => {
+        await requireSupervisor();
 
-    const container = await createContainer();
+        const container = await createContainer();
 
-    return container.profileService.create(input);
+        return container.profileService.create(input);
+    });
 }
-
 
 export async function updateUser(
     email: string,
     input: UpdateProfileInput,
-) {
-    await requireSupervisor();
+): Promise<ActionResult<void>> {
+    return executeAction(async () => {
+        await requireSupervisor();
 
-    const container = await createContainer();
+        const container = await createContainer();
 
-    return container.profileService.update(
-        email,
-        input,
-    );
+        return await container.profileService.update(
+            email,
+            input,
+        );
+    });
 }

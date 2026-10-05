@@ -28,6 +28,8 @@ export default function Sidebar() {
         <Image
           src="/logo.png"
           alt="hsnu logo"
+          width="16"
+          height="16"
           unoptimized
           className="w-16 h-16 rounded-lg"
         />

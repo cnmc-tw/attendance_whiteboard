@@ -41,7 +41,8 @@ export function ClassTable({
 
     const filteredClasses = reports.filter((report) => {
         if (selectedGrade === "全部") return true;
-        return report.grade === parseInt(yearOptions.find((o) => o.value === selectedGrade)?.key!);
+        const matched = yearOptions.find((o) => o.value === selectedGrade);
+        return matched ? report.grade === parseInt(matched.key, 10) : false;
     });
 
     return (

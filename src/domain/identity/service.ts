@@ -3,11 +3,12 @@ import {
     UpdateProfileInput,
     Profile, ProfileQuery,
     ProfileList,
-    Role
+    Role,
+    EMAIL_DOMAIN
 } from "./types";
 
 import { ProfileRepository } from "./repository";
-import { ValidationError, NotFoundError, ConflictError } from "@/src/errors";
+import { ValidationError, NotFoundError, ConflictError } from "@/src/application/errors";
 
 
 export interface ProfileService {
@@ -58,6 +59,12 @@ class DeraultProfileService
         if (existing) {
             throw new ConflictError(
                 "A profile with this email already exists",
+            );
+        }
+
+        if (!input.email.endsWith(EMAIL_DOMAIN)) {
+            throw new ValidationError(
+                "Only school Google Workspace accounts are allowed",
             );
         }
 

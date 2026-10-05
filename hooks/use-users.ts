@@ -80,6 +80,7 @@ function parseUsersError(
     return { type: "UNKNOWN" };
 }
 
+
 export function useUsers(query: UsersQuery) {
     const {
         search,
@@ -177,7 +178,7 @@ export function useUsers(query: UsersQuery) {
             isMounted = false;
             controller.abort();
         };
-    }, [search, roleKey, sort, page, pageSize, refetchIndex, role]);
+    }, [search, roleKey, sort, page, pageSize, refetchIndex]);
 
     return {
         data,

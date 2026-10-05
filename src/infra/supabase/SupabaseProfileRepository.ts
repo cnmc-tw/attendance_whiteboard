@@ -10,7 +10,7 @@ import {
     Role
 } from "../../domain/identity"
 
-import { ValidationError } from "@/src/errors";
+import { ValidationError } from "@/src/application/errors";
 
 
 export class SupabaseProfileRepository
@@ -213,6 +213,7 @@ export class SupabaseProfileRepository
             throw error;
         }
     }
+    
     async delete(email: string): Promise<void> {
         const { error } = await this.from()
             .delete()

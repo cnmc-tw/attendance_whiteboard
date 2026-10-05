@@ -2,12 +2,14 @@
 
 
 import { createContainer } from '@/src/container';
-
+import { requireUser } from '@/src/dal/auth';
+import { executeAction } from "@/src/application/actions/execute-action";
+import type { ActionResult } from "@/src/application/actions/action-result";
 import { ReportItem } from '@/src/domain/attendance';
 
-import { requireUser } from '@/src/dal/auth';
 
-import {ReportSubmissionError, UnauthorizedError, ForbiddenError } from "@/src/errors";
+
+import { ReportSubmissionError, UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 
 export type ReportResponse =
     | {

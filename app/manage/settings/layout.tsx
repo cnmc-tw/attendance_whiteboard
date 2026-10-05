@@ -4,7 +4,7 @@ import React from "react";
 
 
 import { requireSupervisor } from "@/src/dal/auth";
-import { UnauthorizedError, ForbiddenError } from "@/src/errors";
+import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 
 import { forbidden, unauthorized } from "next/navigation";
 

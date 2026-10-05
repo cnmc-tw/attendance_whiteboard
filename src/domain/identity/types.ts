@@ -1,4 +1,6 @@
 
+export const EMAIL_DOMAIN = "@gs.hs.ntnu.edu.tw";
+
 export interface Profile {
 
     email: string;
