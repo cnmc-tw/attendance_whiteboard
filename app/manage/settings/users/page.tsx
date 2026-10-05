@@ -306,7 +306,7 @@ export default function UsersManagementPage()  {
                                         {/* 公務信箱 / 帳號 */}
                                         <td className="py-space-sm px-space-md">
                                         <span className="font-label-md text-label-md text-on-surface">
-                                            {user.emailLocalPart}
+                                            {user.email}
                                         </span>
                                         </td>
 

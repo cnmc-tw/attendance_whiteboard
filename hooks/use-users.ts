@@ -106,7 +106,7 @@ export function useUsers(query: UsersQuery) {
     }, []);
 
     // 將陣列轉為字串變數，確保相依性比對是 Simple Expression
-    const roleKey = role?.join(",");
+    const roleKey = Array.isArray(role) ? role.join(",") : (role ?? "");
 
     useEffect(() => {
         const controller = new AbortController();
@@ -123,8 +123,9 @@ export function useUsers(query: UsersQuery) {
                     params.set("search", search);
                 }
 
-                if (role && role.length > 0) {
-                    for (const value of role) {
+                if (roleKey) {
+                    const roles = roleKey.split(",").filter(Boolean);
+                    for (const value of roles) {
                         params.append("role", value);
                     }
                 }
@@ -178,7 +179,7 @@ export function useUsers(query: UsersQuery) {
             isMounted = false;
             controller.abort();
         };
-    }, [search, roleKey, sort, page, pageSize, refetchIndex]);
+    }, [search, sort, page, pageSize, refetchIndex, roleKey]);
 
     return {
         data,

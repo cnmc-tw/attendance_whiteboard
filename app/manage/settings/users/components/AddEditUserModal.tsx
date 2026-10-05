@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, useWatch } from "react-hook-form";
 
 import { Profile, Role } from "@/src/domain/identity";
 
@@ -23,17 +23,22 @@ type ProfileFormValues = {
     class: string;
 };
 
-
-
-function getEmailLocalPart(email: string): string {
+function parseEmailLocalPart(email: string): { localPart: string; isValid: boolean } {
     const domain = "@gs.hs.ntnu.edu.tw";
 
     if (!email.endsWith(domain)) {
-        throw new Error("Invalid school email");
+        return {
+            localPart: email,
+            isValid: false,
+        };
     }
 
-    return email.slice(0, -domain.length);
+    return {
+        localPart: email.slice(0, -domain.length),
+        isValid: true,
+    };
 }
+
 
 export function AddEditUserModal ({
     isOpen,
@@ -46,7 +51,7 @@ export function AddEditUserModal ({
         register,
         handleSubmit,
         reset,
-        watch,
+        control,
         setValue,
         formState: {
             errors,
@@ -62,14 +67,17 @@ export function AddEditUserModal ({
     });
 
     const [actionError, setActionError] = useState<ActionError | null>(null);
-    const [profileError, setProfileError] = useState<string | null>(null)
+    const profileError = userToEdit && !parseEmailLocalPart(userToEdit.email).isValid
+    ? "人員資料的 Email 格式異常"
+    : null;
 
-
-    const role = watch("role")
+    const role = useWatch({
+        control,
+        name: "role",
+        defaultValue: "monitor"
+    });
 
     useEffect(() => {
-        setProfileError(null);
-
         if (!userToEdit) {
             reset({
                 emailLocalPart: "",
@@ -80,17 +88,14 @@ export function AddEditUserModal ({
             return;
         }
 
-        try {
-            reset({
-                emailLocalPart: getEmailLocalPart(userToEdit.email),
-                name: userToEdit.name,
-                role: userToEdit.role,
-                class: userToEdit.class ?? "",
-            });
-        } catch (error) {
-            console.error("Invalid profile email:", error);
-            setProfileError("人員資料的 Email 格式異常");
-        }
+        const { localPart } = parseEmailLocalPart(userToEdit.email);
+
+        reset({
+            emailLocalPart: localPart,
+            name: userToEdit.name,
+            role: userToEdit.role,
+            class: userToEdit.class ?? "",
+        });
     }, [userToEdit, reset]);
 
     useEffect(() => {
@@ -99,11 +104,7 @@ export function AddEditUserModal ({
         } else if (userToEdit) {
             setValue("class", userToEdit.class)
         }
-    }, [role, setValue]);
-
-    useEffect(() => {
-        setActionError(null)
-    }, [isOpen])
+    }, [role, setValue, userToEdit]);
 
     const errorMessage =
         profileError ??
@@ -167,6 +168,7 @@ export function AddEditUserModal ({
             return;
         }
 
+        setActionError(null);
         onSuccess();
         onClose();
     };
