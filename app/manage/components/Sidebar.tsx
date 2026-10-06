@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import Image from "next/image";
 
-import { SignOutButton } from "./ui";
+import { SignOutButton } from "@/app/components/ui";
 
 interface NavItem {
   name: string;

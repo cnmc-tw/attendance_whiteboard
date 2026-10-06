@@ -123,6 +123,7 @@ async function seed() {
         payload: ReportPayload;
     }[] = [];
 
+    // eslint-disable-next-line no-restricted-syntax
     const today = new Date();
 
     let generatedDays = 0;

@@ -6,6 +6,8 @@ import { useState, useActionState, useEffect } from "react";
 
 import { submitReport } from "@/app/actions"
 
+import { AppTime } from "@/shared/time";
+
 export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
 
     const [cooldown, setCooldown] = useState(0);
@@ -17,7 +19,7 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
     const [otherLeaveSelected, setOtherLeaveSelected] = useState<string[]>([]);
     const [state, formAction, isPending] = useActionState(
         async () => {
-          setSubmittedAt(new Date())
+          setSubmittedAt(AppTime.now())
           return await submitReport({
               sick: sickLeaveSelected.map(v => parseInt(v, 10)),
               personal: personalLeaveSelected.map(v => parseInt(v, 10)),
@@ -33,7 +35,7 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
         cooldownSeconds: number,
     ): number {
         const elapsed =
-            (Date.now() - submittedAt.getTime()) / 1000;
+            (AppTime.now().getTime() - submittedAt.getTime()) / 1000;
 
         return Math.max(
             0,
@@ -61,13 +63,13 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
 
 
     const errorMessages: Record<string, string> = {
-      REPORT_NOT_ALLOWED: "目前不在今日回報時間內。",
-      REPORT_COOLDOWN: "剛才已經送出回報，請稍後再試。",
-      INVALID_PAYLOAD: "回報資料錯誤。",
-      UNAUTHORIZED: "目前登入狀態無效，請重新登入。",
-      NOT_MONITOR: "目前帳號沒有風紀回報權限。",
-      INVALID_MONITOR_CLASS: "目前帳號沒有設定班級。",
-      INTERNAL_ERROR: "系統發生錯誤，請稍後再試。",
+        REPORT_NOT_ALLOWED: "目前不在今日回報時間內。",
+        REPORT_COOLDOWN: "剛才已經送出回報，請稍後再試。",
+        INVALID_PAYLOAD: "回報資料錯誤。",
+        UNAUTHORIZED: "目前登入狀態無效，請重新登入。",
+        NOT_MONITOR: "目前帳號沒有風紀回報權限。",
+        INVALID_MONITOR_CLASS: "目前帳號沒有設定班級。",
+        INTERNAL_ERROR: "系統發生錯誤，請稍後再試。",
     };
 
     const leaveCategories = [
@@ -85,24 +87,24 @@ export function ReportCard({cooldown_seconds} : { cooldown_seconds: string}) {
     function findOptions(selectedCategory: string): { label: string; value: string }[] {
         // 1. 收集「所有假別」已經選取的數字 (將多個子集合併成 Set)
         const allSelectedValues = new Set([
-        ...sickLeaveSelected,
-        ...personalLeaveSelected,
-        ...officialDutySelected,
-        ...otherLeaveSelected,
+            ...sickLeaveSelected,
+            ...personalLeaveSelected,
+            ...officialDutySelected,
+            ...otherLeaveSelected,
         ]);
 
         // 2. 取得「當前正在查看的假別」已經選取的數字
         const currentCategorySelected = new Set(
-        selectedCategory === "病假" ? sickLeaveSelected :
-        selectedCategory === "事假" ? personalLeaveSelected :
-        selectedCategory === "公假" ? officialDutySelected :
-        selectedCategory === "其他 / 曠課" ? otherLeaveSelected : []
+            selectedCategory === "病假" ? sickLeaveSelected :
+            selectedCategory === "事假" ? personalLeaveSelected :
+            selectedCategory === "公假" ? officialDutySelected :
+            selectedCategory === "其他 / 曠課" ? otherLeaveSelected : []
         );
 
         // 3. 過濾選項：
         // 條件：(不在全域已被選取的名單中) OR (屬於當前假別自己選中的)
         return numbers.filter(
-        (option) => !allSelectedValues.has(option.value) || currentCategorySelected.has(option.value)
+            (option) => !allSelectedValues.has(option.value) || currentCategorySelected.has(option.value)
         );
     }
 

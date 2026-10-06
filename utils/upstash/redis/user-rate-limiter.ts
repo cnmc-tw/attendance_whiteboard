@@ -1,6 +1,8 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
+import { AppTime } from "@/shared/time";
+
 const redis = Redis.fromEnv();
 
 const limiter = new Ratelimit({
@@ -25,7 +27,7 @@ export async function checkUserRateLimit(
 
     const retryAfter = Math.max(
         0,
-        Math.ceil((result.reset - Date.now()) / 1000),
+        Math.ceil((result.reset - AppTime.now().getTime()) / 1000),
     );
 
     return {

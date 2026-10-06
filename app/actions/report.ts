@@ -5,6 +5,7 @@ import { createContainer } from '@/src/container';
 import { requireUser } from '@/src/dal/auth';
 import { ReportItem } from '@/src/domain/attendance';
 
+import { AppTime } from '@/shared/time';
 
 
 import { ReportSubmissionError, UnauthorizedError, ForbiddenError } from "@/src/application/errors";
@@ -19,7 +20,9 @@ export type ReportResponse =
         error: string;
       };
 
-export async function getReportsByDate(date: Date = new Date()): Promise<ReportResponse> {
+export async function getReportsByDate(
+    date: Date = AppTime.now()
+): Promise<ReportResponse> {
     try {
         await requireUser();
         const container = await createContainer();

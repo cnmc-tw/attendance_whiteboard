@@ -5,16 +5,17 @@ import { getClassNumberingConfig, getReportsByDate } from "../actions";
 import { ReportItem } from "@/src/domain/attendance";
 
 import { Metadata } from "next";
+import { AppTime } from "@/shared/time";
 
 export const metadata: Metadata = {
     title: "本日回報 - 學務處學生出缺勤回報系統",
     description: "本日全校班級每日出缺勤填報",
 };
 
-export default async function DashboardPage() {
+export default async function Page() {
     const [config, reports] = await Promise.all([
         getClassNumberingConfig(),
-        getReportsByDate(new Date())
+        getReportsByDate(AppTime.now())
     ])
 
     if (!config.data || config.error) return;
@@ -40,7 +41,7 @@ export default async function DashboardPage() {
         
     const yearBaseClass =
         +config.data.baseClass +
-        (new Date().getFullYear() - 
+        (AppTime.year() - 
         +config.data.baseYear - 1) * 
         +config.data.classesPerGrade;
 

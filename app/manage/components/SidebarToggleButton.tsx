@@ -2,7 +2,7 @@
 
 import { useMenu } from './NavWrapper';
 
-export function SidebarToggleButton() {
+export default function SidebarToggleButton() {
   const { toggleMenu } = useMenu();
 
   return (

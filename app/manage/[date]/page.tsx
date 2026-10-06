@@ -8,6 +8,8 @@ import { ReportItem } from "@/src/domain/attendance";
 
 import type { Metadata } from "next";
 
+import { AppTime } from "@/shared/time";
+
 type Props = {
   params: Promise<{ date: string }>;
 };
@@ -63,7 +65,7 @@ export default async function DashboardPage({ params }: Props) {
         
     const yearBaseClass =
         +config.data.baseClass +
-        (new Date().getFullYear() - 
+        (AppTime.year() - 
         +config.data.baseYear - 1) * 
         +config.data.classesPerGrade;
 

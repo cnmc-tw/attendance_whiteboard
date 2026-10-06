@@ -1,8 +1,8 @@
 import React from "react";
 
-import NavWrapper from "../components/NavWrapper";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import NavWrapper from "./components/NavWrapper";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
 
 import { requireInstructor } from "@/src/dal/auth";
 import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";

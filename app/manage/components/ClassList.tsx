@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from "react";
-
-
 import { useRouter } from 'next/navigation';
-
 
 import { ReportItem } from "@/src/domain/attendance"
 
+import { AppTime } from "@/shared/time";
 
 interface ClassTableProps {
   reports: ReportItem[];
@@ -126,7 +124,7 @@ export function ClassTable({
                             {report.submitted_at !== "" ? (
                             <span>
                                 <span className="font-numeric-data text-on-surface font-medium mr-1">
-                                    {new Date(report.submitted_at).toLocaleTimeString("zh-TW")}
+                                    {AppTime.relative(report.submitted_at)}
                                 </span>
                                     ({report.submitted_by})
                             </span>
