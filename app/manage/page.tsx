@@ -7,8 +7,8 @@ import { ReportItem } from "@/src/domain/attendance";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "本日回報 - 學務處學生出缺勤回報系統",
-  description: "生活輔導組及全校班級每日出缺勤填報",
+    title: "本日回報 - 學務處學生出缺勤回報系統",
+    description: "本日全校班級每日出缺勤填報",
 };
 
 export default async function DashboardPage() {

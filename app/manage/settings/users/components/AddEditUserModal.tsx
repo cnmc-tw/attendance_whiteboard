@@ -168,6 +168,12 @@ export function AddEditUserModal ({
             return;
         }
 
+        reset({
+            emailLocalPart: "",
+            name: "",
+            role: "monitor",
+            class: "",
+        });
         setActionError(null);
         onSuccess();
         onClose();

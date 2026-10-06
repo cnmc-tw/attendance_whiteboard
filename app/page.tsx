@@ -10,6 +10,8 @@ import { ReportCard } from "./components/ReportCard";
 
 import { Metadata } from "next";
 
+import { AppTime } from "@/shared/time";
+
 export const metadata: Metadata = {
   title: "每日回報 - 學務處學生出缺勤回報系統",
   description: "生活輔導組及全校班級每日出缺勤填報",
@@ -46,8 +48,9 @@ export default async function DailyReportPage() {
   };
 
   function checkReportAvailability(): ReportAvailability {
-    const now = new Date()
-    const date = now.toLocaleDateString('en-CA')
+    const date = AppTime.date();
+    const day = AppTime.day();
+    const time = AppTime.time();
 
     if (!config.data) {
       return {
@@ -70,16 +73,12 @@ export default async function DailyReportPage() {
       };
     }
 
-    const day = now.getDay();
-
     if (day === 0 || day === 6) {
       return {
         allowed: false,
         message: "今日非回報日",
       };
     }
-
-    const time = now.toTimeString().split(' ')[0]
 
     if (time < config.data!.report_start_time) {
         return {
