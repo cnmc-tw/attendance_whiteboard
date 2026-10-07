@@ -92,7 +92,6 @@ export function useClassHistory(
 
             try {
                 const data = await fetchHistory();
-                console.log("history response", data);
 
                 if (cancelled) {
                     return;

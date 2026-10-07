@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, SubmitHandler, useWatch } from "react-hook-form";
 
-import { Profile, Role } from "@/src/domain/identity";
+import { Profile, Role, EMAIL_DOMAIN } from "@/src/domain/identity";
 
 import { createUser, updateUser } from "@/app/actions"
 
@@ -24,9 +24,8 @@ type ProfileFormValues = {
 };
 
 function parseEmailLocalPart(email: string): { localPart: string; isValid: boolean } {
-    const domain = "@gs.hs.ntnu.edu.tw";
 
-    if (!email.endsWith(domain)) {
+    if (!email.endsWith(EMAIL_DOMAIN)) {
         return {
             localPart: email,
             isValid: false,
@@ -34,7 +33,7 @@ function parseEmailLocalPart(email: string): { localPart: string; isValid: boole
     }
 
     return {
-        localPart: email.slice(0, -domain.length),
+        localPart: email.slice(0, -EMAIL_DOMAIN.length),
         isValid: true,
     };
 }

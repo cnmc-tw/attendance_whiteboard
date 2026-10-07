@@ -100,15 +100,36 @@ function formatDateTime(value: Date): string {
 }
 
 function relative(
-    value: Date | string,
-    reference: Date = now(),
+    value: Date | string | null | undefined,
+    reference: Date = new Date(),
 ): string {
-    const target = typeof value === "string"
-        ? new Date(value)
-        : value;
+    // 1. 基本防呆：若傳入 null/undefined/空字串
+    if (!value) {
+        return String(value);
+    }
 
+    let target: Date;
+
+    if (typeof value === "string") {
+        // 防止傳入 "Invalid Date" 或其他非標準字串
+        const trimmed = value.trim();
+        if (trimmed === "" || trimmed === "Invalid Date") {
+            return String(value);
+        }
+
+        // 處理 PostgreSQL timestamptz 格式
+        const normalized = trimmed
+            .replace(" ", "T")
+            .replace(/(\.\d{3})\d+/, "$1");
+
+        target = new Date(normalized);
+    } else {
+        target = value;
+    }
+
+    // 2. 檢查轉完後的 Date 物件是否合法
     if (Number.isNaN(target.getTime())) {
-        throw new RangeError("Invalid date");
+        return String(value); // ✅ 不拋出 Error，直接回傳預設字串
     }
 
     const diffMs = reference.getTime() - target.getTime();

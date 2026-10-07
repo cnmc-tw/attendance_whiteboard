@@ -53,7 +53,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
                   學務處學生缺曠回報
                 </h1>
                 <p className="text-on-surface-variant font-body-md">
-                  本系統為校內行政與班級出缺勤回報專用平台。請使用學校公務信箱登入
+                  本系統為校內行政與班級出缺勤回報專用平台。請使用學校信箱登入
                 </p>
             </div>
             
@@ -69,7 +69,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
                   contact_support
                 </span>
                 <span className="font-body-sm text-body-sm">
-                  若無法登入或，請洽{" "}
+                  若無法登入，請洽{" "}
                   <span className="font-semibold text-on-surface">
                     生輔組。
                   </span>

@@ -120,7 +120,6 @@ export class SupabaseReportRepository
             error.code === "P0001" &&
             this.isReportSubmissionErrorCode(error.message)
         ) {
-            console.log("Report submission error:", error.message);
             throw new ReportSubmissionError(error.message);
         }
 
