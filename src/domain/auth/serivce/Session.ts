@@ -20,22 +20,10 @@ class DefaultSessionService implements SessionService {
     async exchangeCodeForSession(code: string): Promise<void> {
         await this.sessionProvider.exchangeCodeForSession(code);
 
-        const user = await this.userProvider.get();
-
-        if (!user?.email) {
-            return;
-        }
-
-        const profile = await this.profileRepository.getUserByEmail(user.email);
-        
-
-        if (!profile) return;
-
-        if (profile.auth_user_id !== user.id) {
-            profile.auth_user_id = user.id;
-            profile.name = user.user_metadata?.full_name;
-            await this.profileRepository.update(user.email, profile);
-        }
+        // V2/V4: linking is performed server-side against a *verified* email.
+        // The client can no longer write auth_user_id / name directly; the
+        // RPC is the single trusted path and is idempotent.
+        await this.sessionProvider.linkIdentity();
     }
 
 }
