@@ -45,7 +45,7 @@ export default async function ClassDetailPage({ params }: Props) {
       <div className="relative bg-surface-container-lowest rounded-xl p-space-lg shadow-sm overflow-hidden mb-space-lg border border-outline-variant">
         <div className="absolute top-0 left-0 bottom-0 w-2 bg-primary-container" />
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-space-lg pl-space-xs">
-          <div className="flex flex-col gap-space-xs">
+          {/* <div className="flex flex-col gap-space-xs">
             <div className="flex items-center gap-space-sm flex-wrap">
               <h1 className="text-lg text-primary tracking-tight font-bold">
                 {name} 班 出缺勤紀錄表
@@ -56,7 +56,7 @@ export default async function ClassDetailPage({ params }: Props) {
             </div>
             <span className="font-semibold text-on-surface">風紀：{'王小明'}</span>
 
-            {/* Today's live tally chips */}
+
             <div className="flex flex-wrap items-center gap-space-sm mt-space-xs">
               <div className="flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1 rounded border border-outline-variant/30">
                 <span className="material-symbols-outlined text-[16px] text-primary-container">
@@ -81,7 +81,7 @@ export default async function ClassDetailPage({ params }: Props) {
                 </span>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Action Buttons */}
           {/* <div className="flex items-center gap-space-sm flex-wrap xl:self-start">

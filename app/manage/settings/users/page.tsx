@@ -2,6 +2,8 @@
 import { Role, Profile } from "@/src/domain/identity";
 
 import { useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { UserToolbar } from "./components/UserToolbar";
 
@@ -12,6 +14,9 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { AddEditUserModal } from "./components/AddEditUserModal";
 
 import { ImportCsvModal } from "./components/ImportCsvModal";
+import { DeleteUserDialog } from "./components/DeleteUserDialog";
+import { deleteUser } from "@/app/actions/user";
+import type { ActionError } from "@/src/application/actions/action-result";
 
 
 import Link from "next/link"
@@ -23,6 +28,11 @@ export default function UsersManagementPage()  {
     const [userToEdit, setUserToEdit] = useState<Profile | null>(null);
     const [isAddEditModalOpen, setIsAddEditModalOpen] = useState<boolean>(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
+    const [openActionMenuEmail, setOpenActionMenuEmail] = useState<string | null>(null);
+    const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+    const [deleteSuccessMessage, setDeleteSuccessMessage] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
 
     const [currentPage, setCurrentPage] =
@@ -133,6 +143,52 @@ export default function UsersManagementPage()  {
     const handleAddUser = () => {
         setUserToEdit(null);
         setIsAddEditModalOpen(true);
+    };
+
+    const getDeleteErrorMessage = (actionError: ActionError) => {
+        switch (actionError) {
+            case "UNAUTHORIZED":
+                return "登入狀態已失效，請重新登入。";
+            case "FORBIDDEN":
+                return "您沒有權限刪除使用者。";
+            case "VALIDATION_ERROR":
+                return "使用者資料格式不符合要求。";
+            case "CONFLICT":
+                return "使用者資料目前無法刪除，請重新整理後再試。";
+            case "NOT_FOUND":
+                return "找不到這筆使用者資料，請重新整理列表。";
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!userToDelete || isDeleting) {
+            return;
+        }
+
+        setIsDeleting(true);
+        setDeleteError(null);
+        setDeleteSuccessMessage(null);
+
+        try {
+            const result = await deleteUser(userToDelete.email);
+            if (!result.success) {
+                setDeleteError(getDeleteErrorMessage(result.error));
+                return;
+            }
+
+            const deletedUser = userToDelete;
+            setUserToDelete(null);
+            setSelectedIds((ids) =>
+                ids.filter((id) => id !== deletedUser.auth_user_id)
+            );
+            setDeleteSuccessMessage(`已刪除使用者「${deletedUser.name}」。`);
+            void refetch();
+        } catch (error) {
+            console.error("Failed to delete user", error);
+            setDeleteError("刪除使用者時發生錯誤，請稍後再試。");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const handleDownloadTemplate = () => {
@@ -318,14 +374,61 @@ export default function UsersManagementPage()  {
                                         {/* 操作 */}
                                         <td className="py-space-sm pr-space-md pl-space-xs text-right">
                                         <div className="inline-flex items-center gap-1">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEditUser(user)}
-                                                title="更多動作"
-                                                className="p-1.5 rounded-lg hover:bg-surface-container text-secondary hover:text-error transition-colors cursor-pointer"
+                                            <Popover.Root
+                                                open={openActionMenuEmail === user.email}
+                                                onOpenChange={(open) =>
+                                                    setOpenActionMenuEmail(open ? user.email : null)
+                                                }
                                             >
-                                                <span className="material-symbols-outlined text-[18px]">more_vert</span>
-                                            </button>
+                                                <Popover.Trigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`更多動作：${user.name}`}
+                                                        title="更多動作"
+                                                        disabled={isDeleting}
+                                                        className="min-h-10 min-w-10 rounded-lg hover:bg-surface-container text-secondary transition-colors disabled:opacity-50 cursor-pointer"
+                                                    >
+                                                        <MoreVertical aria-hidden="true" className="mx-auto h-5 w-5" />
+                                                    </button>
+                                                </Popover.Trigger>
+                                                <Popover.Portal>
+                                                    <Popover.Content
+                                                        role="menu"
+                                                        aria-label={`${user.name}的使用者動作`}
+                                                        side="bottom"
+                                                        align="end"
+                                                        sideOffset={4}
+                                                        className="z-50 min-w-40 rounded-lg border border-outline-variant bg-surface-container-lowest p-1 shadow-lg"
+                                                    >
+                                                        <Popover.Close asChild>
+                                                            <button
+                                                                type="button"
+                                                                role="menuitem"
+                                                                onClick={() => handleEditUser(user)}
+                                                                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-on-surface hover:bg-surface-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                                            >
+                                                                <Pencil aria-hidden="true" className="h-4 w-4" />
+                                                                編輯使用者
+                                                            </button>
+                                                        </Popover.Close>
+                                                        <Popover.Close asChild>
+                                                            <button
+                                                                type="button"
+                                                                role="menuitem"
+                                                                onClick={() => {
+                                                                    setDeleteError(null);
+                                                                    setDeleteSuccessMessage(null);
+                                                                    setUserToDelete(user);
+                                                                }}
+                                                                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-red-700 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+                                                            >
+                                                                <Trash2 aria-hidden="true" className="h-4 w-4" />
+                                                                刪除使用者
+                                                            </button>
+                                                        </Popover.Close>
+                                                    </Popover.Content>
+                                                </Popover.Portal>
+                                            </Popover.Root>
                                         </div>
                                         </td>
                                     </tr>
@@ -395,6 +498,12 @@ export default function UsersManagementPage()  {
                     </div>
                 </footer>
 
+                {deleteSuccessMessage && (
+                    <p role="status" className="px-space-md py-space-sm font-body-sm text-body-sm text-green-800">
+                        {deleteSuccessMessage}
+                    </p>
+                )}
+
                 {/* 批次匯入 Modal */}
                 <ImportCsvModal
                     isOpen={isImportModalOpen}
@@ -409,6 +518,19 @@ export default function UsersManagementPage()  {
                     userToEdit={userToEdit}
                     onClose={() => setIsAddEditModalOpen(false)}
                     onSuccess={refetch}
+                />
+
+                <DeleteUserDialog
+                    isOpen={!!userToDelete}
+                    user={userToDelete}
+                    isDeleting={isDeleting}
+                    error={deleteError}
+                    onClose={() => {
+                        setUserToDelete(null);
+                        setDeleteError(null);
+                        refetch()
+                    }}
+                    onConfirm={handleConfirmDelete}
                 />
 
             </div>
