@@ -44,7 +44,7 @@ export const UserToolbar: React.FC<UserToolbarProps> = ({
         </div>
 
         {/* 匯入 / 匯出專屬操作群組 */}
-        <div className="flex items-center gap-space-xs flex-wrap justify-end">
+        {/* <div className="flex items-center gap-space-xs flex-wrap justify-end">
           <button
             id="importCsvBtn"
             type="button"
@@ -63,7 +63,7 @@ export const UserToolbar: React.FC<UserToolbarProps> = ({
             <span className="material-symbols-outlined text-[16px] text-secondary">download</span>
             <span>下載格式範本</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* 篩選膠囊標籤列 (Role & Status Filters) */}

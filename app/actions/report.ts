@@ -67,7 +67,7 @@ export async function submitReport(
     payload: Record<string, number[]>
 ): Promise<SubmitReportState> {
 
-    
+
     try {
 
         await requireUser();
@@ -100,7 +100,8 @@ export async function submitReport(
             };
         }
 
-        console.error(error);
+        // V15: do not log full error objects (may contain PII / payload).
+        console.error("submitReport failed:", error instanceof Error ? error.name : "unknown");
 
         return {
             success: false,

@@ -305,21 +305,21 @@ export default function UsersManagementPage()  {
 
                                         {/* 公務信箱 / 帳號 */}
                                         <td className="py-space-sm px-space-md">
-                                        <span className="font-label-md text-label-md text-on-surface">
-                                            {user.email}
-                                        </span>
+                                            <span className="font-label-md text-label-md text-on-surface">
+                                                {user.email}
+                                            </span>
                                         </td>
 
                                         {/* 操作 */}
                                         <td className="py-space-sm pr-space-md pl-space-xs text-right">
                                         <div className="inline-flex items-center gap-1">
                                             <button
-                                            type="button"
-                                            onClick={() => handleEditUser(user)}
-                                            title="更多動作"
-                                            className="p-1.5 rounded-lg hover:bg-surface-container text-secondary hover:text-error transition-colors cursor-pointer"
+                                                type="button"
+                                                onClick={() => handleEditUser(user)}
+                                                title="更多動作"
+                                                className="p-1.5 rounded-lg hover:bg-surface-container text-secondary hover:text-error transition-colors cursor-pointer"
                                             >
-                                            <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                                                <span className="material-symbols-outlined text-[18px]">more_vert</span>
                                             </button>
                                         </div>
                                         </td>

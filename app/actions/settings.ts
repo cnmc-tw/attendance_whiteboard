@@ -96,6 +96,9 @@ export async function getClassNumberingConfig(): Promise<ConfigResponse<ClassNum
 }
 
 export async function getSettings() {
+    // V7: previously unauthenticated. Require a valid app user; RLS remains the
+    // final gate, but do not rely on it alone.
+    await requireUser();
     const container = await createContainer();
     return container.settingsService.getSettings();
 }
@@ -110,11 +113,11 @@ export type UpdateSettingsState =
       };
 
 export async function setSettings(setting: SystemConfig): Promise<UpdateSettingsState> {
-    
+
     try {
         await requireSupervisor();
         const container = await createContainer();
-        container.settingsService.setSettings(setting);
+        await container.settingsService.setSettings(setting);
 
         return {
             success: true,

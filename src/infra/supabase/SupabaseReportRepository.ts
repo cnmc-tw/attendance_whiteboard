@@ -9,7 +9,7 @@ import {
 
 import { ReportSubmissionError, ReportSubmissionErrorCode } from "@/src/application/errors";
 
-export class SupabaseReportRepository 
+export class SupabaseReportRepository
     implements ReportRepository {
 
     constructor(
@@ -131,12 +131,14 @@ export class SupabaseReportRepository
         reportDate: string,
         payload: Record<string, number[]>
     ): Promise<void> {
+        // V9: parameter names/types must match the patched RPC signature
+        // correct_report(p_class text, p_report_date date, p_payload jsonb).
         const { error } = await this.client
             .schema("attendance")
             .rpc("correct_report", {
-                class: classNo,
-                report_date: reportDate,
-                payload: payload,
+                p_class: classNo,
+                p_report_date: reportDate,
+                p_payload: payload,
             });
 
         if (error) {

@@ -1,6 +1,7 @@
 import { SignInWithGoogleButton } from "./components";
 
 import { requireUser } from "@/src/dal/auth";
+import { safeInternalPath } from "@/lib/safe-redirect";
 
 import { redirect } from "next/navigation";
 
@@ -20,6 +21,8 @@ type PageProps = {
 export default async function LoginPage({ searchParams }: PageProps) {
 
   const { redirect_to } = await searchParams;
+  // V5: sanitise before it is ever reflected into the OAuth redirect flow.
+  const safeRedirect = safeInternalPath(redirect_to);
 
   try {
     const user = await requireUser();
@@ -45,7 +48,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
         </div>
                 
         <div className="mt-8 space-y-4">
-            <SignInWithGoogleButton redirectUrl={redirect_to || "/"} />
+            <SignInWithGoogleButton redirectUrl={safeRedirect} />
         </div>
 
         {/* Administrative Contact Section */}
