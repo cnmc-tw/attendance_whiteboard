@@ -3,9 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(
     request: NextRequest,
+    requestHeaders: Headers,
 ): Promise<NextResponse> {
     let response = NextResponse.next({
-        request,
+        request: {
+            headers: requestHeaders,
+        },
     });
 
     const supabase = createServerClient(
@@ -22,17 +25,21 @@ export async function updateSession(
                         request.cookies.set(name, value);
                     });
 
+                    // 將更新後的 Cookie 同步到下游請求
+                    requestHeaders.set(
+                        "cookie",
+                        request.cookies.toString(),
+                    );
+
                     response = NextResponse.next({
-                        request,
+                        request: {
+                            headers: requestHeaders,
+                        },
                     });
 
                     cookiesToSet.forEach(
                         ({ name, value, options }) => {
-                            response.cookies.set(
-                                name,
-                                value,
-                                options,
-                            );
+                            response.cookies.set(name, value, options);
                         },
                     );
                 },
@@ -40,16 +47,8 @@ export async function updateSession(
         },
     );
 
-    // Do not run code between createServerClient and
-    // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-    // issues with users being randomly logged out.
-    // IMPORTANT: If you remove getClaims() and you use server-side rendering
-    // with the Supabase client, your users may be randomly logged out.
-
     const { data } = await supabase.auth.getClaims();
-
     const { pathname } = request.nextUrl;
-
     const user = data?.claims;
 
     const isProtected =
@@ -57,9 +56,13 @@ export async function updateSession(
         pathname.startsWith("/manage");
 
     if (isProtected && !user) {
-        return NextResponse.redirect(
-            new URL("/login?redirect_to=" + request.nextUrl, request.url),
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set(
+            "redirect_to",
+            request.nextUrl.pathname + request.nextUrl.search,
         );
+
+        return NextResponse.redirect(loginUrl);
     }
 
     return response;

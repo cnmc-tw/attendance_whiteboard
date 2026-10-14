@@ -9,12 +9,16 @@ export async function GET(request: Request) {
   // V5: only same-origin relative paths are honoured; everything else -> "/".
   const redirect_to = safeInternalPath(searchParams.get('redirect_to'));
 
+  console.log("redirect_to", redirect_to);
+
   if (!code)  return NextResponse.redirect(new URL("/login", origin));
 
   try {
     await exchangeCodeForSession(code);
-  } catch {
-    return NextResponse.redirect(new URL("/login", origin));
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.redirect(new URL("/login", origin));
+    }
   }
 
   return NextResponse.redirect(new URL(redirect_to, origin));

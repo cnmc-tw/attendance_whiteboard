@@ -30,7 +30,6 @@ export default function Sidebar() {
           alt="hsnu logo"
           width="16"
           height="16"
-          unoptimized
           className="w-16 h-16 rounded-lg"
         />
         <div className="flex flex-col">
