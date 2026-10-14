@@ -24,6 +24,14 @@ import {
     ProfileService
 } from '../domain/identity';
 
+import {
+    createProfileSynchronizer,
+    ProfileSynchronizer
+} from '../domain/identity/import';
+import { diffProfiles } from '../domain/identity/import/diff';
+import type { ProfileDiff, ProfileImportRow } from '../domain/identity/import';
+import type { Profile } from '../domain/identity';
+
 
 import {
     SupabaseUserProvider,
@@ -36,6 +44,10 @@ import {
 export interface Container {
 
     profileService: ProfileService;
+
+    profileSynchronizer: ProfileSynchronizer;
+
+    diffProfiles(imported: ProfileImportRow[], current: Profile[]): ProfileDiff;
 
     sessionService: SessionService;
 
@@ -66,8 +78,12 @@ export const createContainer = cache(async (): Promise<Container> => {
 
     const profileService = createProfileService(profileRepository);
 
+    const profileSynchronizer = createProfileSynchronizer(profileRepository);
+
     return {
         profileService,
+        profileSynchronizer,
+        diffProfiles,
         sessionService,
         settingsService,
         reportService

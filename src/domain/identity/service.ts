@@ -14,6 +14,8 @@ import { ValidationError, NotFoundError, ConflictError } from "@/src/application
 export interface ProfileService {
     getUserByEmail(email: string): Promise<Profile | null>;
 
+    getUsersByRole(role: Role): Promise<Profile[]>;
+
     create(
         input: CreateProfileInput,
     ): Promise<void>;
@@ -26,6 +28,8 @@ export interface ProfileService {
     find(
         query: ProfileQuery,
     ): Promise<ProfileList>;
+
+    delete(email: string): Promise<void>;
 }
 
 class DeraultProfileService 
@@ -39,6 +43,10 @@ class DeraultProfileService
         email: string,
     ): Promise<Profile | null> {
         return this.profileRepository.getUserByEmail(email);
+    }
+
+    async getUsersByRole(role: Role): Promise<Profile[]> {
+        return this.profileRepository.getUsersByRole(role);
     }
 
     async create(
@@ -101,6 +109,10 @@ class DeraultProfileService
         query: ProfileQuery,
     ): Promise<ProfileList> {
         return this.profileRepository.find(query);
+    }
+
+    async delete(email: string): Promise<void> {
+        await this.profileRepository.delete(email);
     }
 
     private normalizeInput(

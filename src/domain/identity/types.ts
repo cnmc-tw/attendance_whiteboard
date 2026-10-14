@@ -59,3 +59,12 @@ export interface ProfileList {
 
     pageSize: number;
 }
+
+export interface ProfileSyncInput {
+    create: CreateProfileInput[];
+    update: {
+        email: string;
+        profile: UpdateProfileInput;
+    }[];
+    remove: string[];
+}

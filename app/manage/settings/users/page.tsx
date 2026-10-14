@@ -136,12 +136,17 @@ export default function UsersManagementPage()  {
     };
 
     const handleDownloadTemplate = () => {
-        alert("正在下載「校園出缺勤人員匯入標準範本 (campus_users_template.csv)」");
-    };
-
-    const handleConfirmImport = (file: File | null) => {
-        const fileName = file ? file.name : "模擬資料.csv";
-        alert(`匯入解析作業中：已成功讀取 [${fileName}]，即將更新全校名冊。`);
+        const template = new Blob(["\uFEFFemail,class,role,name\r\n"], {
+            type: "text/csv;charset=utf-8",
+        });
+        const url = URL.createObjectURL(template);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "monitor_import_template.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
 
@@ -394,8 +399,8 @@ export default function UsersManagementPage()  {
                 <ImportCsvModal
                     isOpen={isImportModalOpen}
                     onClose={() => setIsImportModalOpen(false)}
-                    onConfirmImport={handleConfirmImport}
                     onDownloadTemplate={handleDownloadTemplate}
+                    onSuccess={refetch}
                 />
 
                 {/* 新增/編輯人員 Modal */}

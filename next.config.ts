@@ -14,6 +14,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
     experimental: {
         authInterrupts: true, // 啟用權限中斷功能
+        serverActions: {
+            bodySizeLimit: "5.1mb",
+        },
     },
     async headers() {
         return [{ source: "/:path*", headers: securityHeaders }];

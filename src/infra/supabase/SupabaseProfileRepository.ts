@@ -4,13 +4,14 @@ import {
     Profile,
     CreateProfileInput,
     UpdateProfileInput,
+    ProfileSyncInput,
     ProfileQuery,
     ProfileList,
     ProfileRepository,
     Role
 } from "../../domain/identity"
 
-import { ValidationError } from "@/src/application/errors";
+import { ValidationError, MonitorImportErrorCode, MonitorImportError, UnauthorizedError, ForbiddenError } from "@/src/application/errors";
 
 
 export class SupabaseProfileRepository
@@ -24,6 +25,15 @@ export class SupabaseProfileRepository
         return this.client
             .schema("identity")
             .from("users");
+    }
+
+    private isMonitorImportErrorCode(
+        value: string
+    ): value is MonitorImportErrorCode {
+        return [
+            "INVALID_PROFILE_SYNC_INPUT",
+            "INVALID_MONITOR_PROFILE",
+        ].includes(value as MonitorImportErrorCode);
     }
 
     private buildQuery(query: ProfileQuery) {
@@ -137,15 +147,18 @@ export class SupabaseProfileRepository
     async getUsersByRole(
         role: Role
     ): Promise<Profile[]> {
-        const { data, error } = await this.from()
-            .select("*")
-            .eq("role", role);
-
-        if (error) {
-            throw error;
+        const pageSize = 500;
+        const profiles: Profile[] = [];
+        for (let from = 0; ; from += pageSize) {
+            const { data, error } = await this.from()
+                .select("*")
+                .eq("role", role)
+                .order("email", { ascending: true })
+                .range(from, from + pageSize - 1);
+            if (error) throw error;
+            profiles.push(...(data ?? []));
+            if (!data || data.length < pageSize) return profiles;
         }
-
-        return data;
     }
 
     async getUsers(): Promise<Profile[]> {
@@ -179,6 +192,34 @@ export class SupabaseProfileRepository
         };
     }
 
+    async synchronize(input: ProfileSyncInput): Promise<void> {
+        const { error } = await this.client.schema("identity").rpc(
+            "synchronize_monitor_profiles",
+            {
+                p_input: input,
+            },
+        );
+
+        if (!error) {
+            return;
+        }
+
+
+        if (error.code === "42501" && error.message === "UNAUTHORIZED") {
+            throw new UnauthorizedError();
+        }
+
+        if (error.code === "42501" && error.message === "INSUFFICIENT_ROLE") {
+            throw new ForbiddenError();
+        }
+
+        if (error.code === "22023" && this.isMonitorImportErrorCode(error.message)) {
+            throw new MonitorImportError(error.message);
+        }
+
+        throw error;
+    }
+
     async create(profile: CreateProfileInput): Promise<void> {
         const { error } = await this.from()
             .insert(profile);
@@ -187,15 +228,6 @@ export class SupabaseProfileRepository
             throw error;
         }
 
-    }
-
-    async createMany(profiles: Profile[]): Promise<void> {
-        const { error } = await this.from()
-            .insert(profiles);
-
-        if (error) {
-            throw error;
-        }
     }
 
     async update(
@@ -224,25 +256,5 @@ export class SupabaseProfileRepository
         }
     }
 
-    async deleteMany(emails: string[]): Promise<void> {
-        const { error } = await this.from()
-            .delete()
-            .in("email", emails);
-
-        if (error) {
-            throw error;
-        }
-
-    }
-
-    async deleteByRole(role: Role): Promise<void> {
-        const { error } = await this.from()
-            .delete()
-            .eq("role", role);
-            
-        if (error) {
-            throw error;
-        }
-    }
     
 }

@@ -17,6 +17,22 @@ export class ReportSubmissionError extends Error {
     }
 }
 
+export type MonitorImportErrorCode =
+    | "UNAUTHORIZED"
+    | "FORBIDDEN"
+    | "INVALID_PROFILE_SYNC_INPUT"
+    | "INVALID_MONITOR_PROFILE"
+    | "INTERNAL_ERROR";
+
+export class MonitorImportError extends Error {
+    constructor(
+        public readonly code: MonitorImportErrorCode
+    ) {
+        super(code);
+        this.name = "MonitorImportError";
+    }
+}
+
 export class ValidationError extends Error {
     constructor(message: string) {
         super(message)

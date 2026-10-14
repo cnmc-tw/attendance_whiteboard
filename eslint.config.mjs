@@ -7,6 +7,8 @@ const eslintConfig = defineConfig([
     ...nextTs,
 
     {
+        files: ["**/*.ts", "**/*.tsx"],
+        ignores: ["shared/time/app-time.ts"],
         rules: {
             "no-restricted-syntax": [
                 "error",
