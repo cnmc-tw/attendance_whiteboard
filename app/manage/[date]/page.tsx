@@ -1,34 +1,38 @@
-import { Metrics, ClassTable, MetricsData } from "../components"
+import { Metrics, ClassTable, ClassTableSkeleton, MetricsData } from "../components"
 
 import { notFound } from "next/navigation";
 
 import { getClassNumberingConfig, getReportsByDate } from "../../actions";
 
+import { AutoRefresh } from "@/app/components/ui";
+
 import { ReportItem } from "@/src/domain/attendance";
 
 import type { Metadata } from "next";
-
+import { Suspense } from "react";
 import { AppTime } from "@/shared/time";
 
 type Props = {
-  params: Promise<{ date: string }>;
+    params: Promise<{ date: string }>;
 };
 
 // 使用 generateMetadata 動態生成 Metadata
 export async function generateMetadata(
-  { params }: Props
+    { params }: Props
 ): Promise<Metadata> {
-  // 1. 等待解構 params
-  const { date } = await params;
+    // 1. 等待解構 params
+    const { date } = await params;
 
-  // 2. 解碼網址參數（如果 name 包含中文或特殊字元）
-  const decodedName = decodeURIComponent(date);
+    // 2. 判斷是否為今天，決定顯示的名稱
+    const decodedName = date === AppTime.date() 
+        ? "本日回報" 
+        : decodeURIComponent(date);
 
-  // 3. 回傳動態設定的 metadata
-  return {
-    title: `${decodedName} - 管理後臺 - 學務處學生出缺勤回報系統`,
-    description: `生活輔導組及全校班級每日出缺勤填報 - ${decodedName}`,
-  };
+    // 3. 回傳動態設定的 metadata
+    return {
+        title: `${decodedName}學務處學生出缺勤回報系統`,
+        description: `生活輔導組及全校班級每日出缺勤填報 - ${decodedName}`,
+    };
 }
 
 
@@ -62,11 +66,11 @@ export default async function DashboardPage({ params }: Props) {
     }
 
     const reportsMap = new Map(reports.data!.map((report) => [report.class, report]))
-        
+
     const yearBaseClass =
         +config.data.baseClass +
-        (AppTime.year() - 
-        +config.data.baseYear - 1) * 
+        (AppTime.year() -
+            +config.data.baseYear - 1) *
         +config.data.classesPerGrade;
 
     function getGrade(
@@ -86,7 +90,7 @@ export default async function DashboardPage({ params }: Props) {
         return 3 - Math.floor(offset / +config.data!.classesPerGrade);
     }
 
-    const allClass =  Array.from({ length: 3 * +config.data.classesPerGrade }, (_, i) => {
+    const allClass = Array.from({ length: 3 * +config.data.classesPerGrade }, (_, i) => {
         return String(yearBaseClass + i)
     });
 
@@ -142,7 +146,7 @@ export default async function DashboardPage({ params }: Props) {
 
     function getFormattedDate(date: Date): string {
         const days = ['日', '一', '二', '三', '四', '五', '六'] as const;
-        
+
         const year = date.getFullYear() - 1911;
         const month = date.getMonth() + 1;
         const day = date.getDate();
@@ -151,21 +155,26 @@ export default async function DashboardPage({ params }: Props) {
         return `${year}年${month}月${day}日 (${dayName})`;
     }
 
-  return (
-    <div className="flex flex-col gap-space-lg w-full">
-      <div className="flex flex-col">
-          <h1 className="font-display text-4xl text-primary tracking-tight font-bold">
-            {getFormattedDate(today)} 全校回報概況
-          </h1>
+    return (
+        <div className="flex flex-col gap-space-lg w-full">
+
+            <AutoRefresh intervalMs={30000} />\
+
+            <div className="flex flex-col">
+                <h1 className="font-display text-4xl text-primary tracking-tight font-bold">
+                    {getFormattedDate(today)} 全校回報概況
+                </h1>
+            </div>
+
+            {/* Metrics Grid */}
+            <Metrics data={data} />
+
+            {/* Class List Table */}
+            <Suspense fallback={<ClassTableSkeleton />}>
+                <ClassTable reports={fullReport} />
+            </Suspense>
+
+
         </div>
-
-      {/* Metrics Grid */}
-      <Metrics data={data} />
-
-      {/* Class List Table */}
-      <ClassTable reports={fullReport} />
-
-    
-    </div>
-  );
+    );
 }

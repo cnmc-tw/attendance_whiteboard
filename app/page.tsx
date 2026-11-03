@@ -1,120 +1,34 @@
+// app/daily-report/page.tsx
+import { Suspense } from "react";
 import { redirect, forbidden } from "next/navigation";
-import { getReportConfig, getLeastReportByClass } from "./actions";
-
 import { requireUser } from "@/src/dal/auth";
 import { UnauthorizedError, ForbiddenError } from "@/src/application/errors";
-
 import Card, { SignOutButton } from "./components/ui";
+import { ReportSection } from "./components/ReportSection";
 
-import { ReportCard } from "./components/ReportForms";
-
-import { Metadata } from "next";
-
-import { AppTime } from "@/shared/time";
-
-export const metadata: Metadata = {
-    title: "每日回報 - 學務處學生出缺勤回報系統",
-    description: "生活輔導組及全校班級每日出缺勤填報",
-};
+function ReportSkeleton() {
+    return (
+        <div className="h-48 bg-gray-100 rounded-xl animate-pulse my-4 flex items-center justify-center">
+            <span className="text-gray-400">載入中...</span>
+        </div>
+    );
+}
 
 export default async function DailyReportPage() {
-
-    let usr, report
-
+    let usr;
     try {
-        const user = await requireUser()
-        if (user.role !== "monitor") redirect('/manage');
-        usr = user
+        usr = await requireUser();
     } catch (error) {
-
-        if (error instanceof UnauthorizedError) {
-            redirect("/login");
-        }
-
-        if (error instanceof ForbiddenError) {
-            forbidden();
-        }
-
+        if (error instanceof UnauthorizedError) redirect("/login");
+        if (error instanceof ForbiddenError) forbidden();
         throw error;
     }
 
-
-
-    const [config, lastReport] = await Promise.all([
-        getReportConfig(),
-        getLeastReportByClass(usr.class)
-    ])
-
-    if (!lastReport.data) {
-        report = null
-    } else {
-        report = lastReport.data
-    }
-
-    
-
-    type ReportAvailability = {
-        allowed: boolean;
-        message?: string;
-    };
-
-    function checkReportAvailability(): ReportAvailability {
-        const date = AppTime.date();
-        const day = AppTime.day();
-        const time = AppTime.time();
-
-        if (!config.data) {
-            return {
-                allowed: false,
-                message: `系統尚未啟用`
-            }
-        }
-
-        if (date < config.data!.semester_start) {
-            return {
-                allowed: false,
-                message: `本學期尚未開始`,
-            };
-        }
-
-        if (date > config.data!.semester_end) {
-            return {
-                allowed: false,
-                message: `本學期已結束`,
-            };
-        }
-
-        if (day === 0 || day === 6) {
-            return {
-                allowed: false,
-                message: "今日非回報日",
-            };
-        }
-
-        if (time < config.data!.report_start_time) {
-            return {
-                allowed: false,
-                message: "今日回報尚未開始",
-            };
-        }
-
-        if (time > config.data!.report_end_time) {
-            return {
-                allowed: false,
-                message: "今日回報時間已結束",
-            };
-        }
-
-        return {
-            allowed: true,
-        };
-    }
-
-    const allow = checkReportAvailability()
+    if (usr.role !== "monitor") redirect("/manage");
 
     return (
         <Card>
-            {/* Header Block */}
+            {/* 1. 外頁與標題：秒開直接渲染 */}
             <div className="text-center mb-8">
                 <h1 className="font-headline-lg text-3xl font-extrabold text-primary-container mb-2">
                     學務處學生缺曠回報
@@ -124,17 +38,15 @@ export default async function DailyReportPage() {
                 </p>
             </div>
 
-            {!allow.allowed && (<h1 className="text-2xl text-center text-on-surface mb-space-sm tracking-tight font-bold">
-                {allow.message}
-            </h1>)}
+            {/* 2. 資料密集區塊：使用 Suspense 達成獨立 Streaming */}
+            <Suspense fallback={<ReportSkeleton />}>
+                <ReportSection userClass={usr.class} />
+            </Suspense>
 
-            {allow.allowed && (<ReportCard cooldown_seconds={config.data!.report_cooldown_seconds} report={report} />)}
-
-            <div className="flex justify-center">
+            {/* 3. 靜態操作按鈕：秒開直接渲染 */}
+            <div className="flex justify-center mt-6">
                 <SignOutButton />
             </div>
         </Card>
     );
 }
-
-

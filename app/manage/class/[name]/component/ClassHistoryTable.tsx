@@ -1,6 +1,7 @@
 "use client";
 
 import { useClassHistory } from "@/hooks/use-class-history";
+import { ClassHistoryTableSkeleton } from "./ClassHistoryTableSkeleton"
 
 type ClassHistoryTableProps = {
     classNo: string;
@@ -37,20 +38,7 @@ export function ClassHistoryTable({
     } = useClassHistory(classNo);
 
     if (isLoading) {
-        return (
-            <div className="overflow-hidden rounded-3xl border border-outline-variant bg-surface-container-lowest">
-                <div className="animate-pulse">
-                    <div className="h-14 bg-surface-container" />
-
-                    {Array.from({ length: 6 }).map((_, index) => (
-                        <div
-                            key={index}
-                            className="h-16 border-t border-outline-variant bg-surface-container-low"
-                        />
-                    ))}
-                </div>
-            </div>
-        );
+        return <ClassHistoryTableSkeleton />;
     }
 
     if (error) {

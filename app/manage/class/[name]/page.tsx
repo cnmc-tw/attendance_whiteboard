@@ -1,8 +1,9 @@
 import Link from "next/link";
 
-import { ClassHistoryTable } from "./component/ClassHistoryTable"
+import { ClassHistoryTable, ClassHistoryTableSkeleton } from "./component";
 
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { getLeastReportByClass } from "@/app/actions";
 
@@ -164,7 +165,9 @@ export default async function ClassDetailPage({ params }: Props) {
       </div>
 
       {/* Roster & Attendance History Table */}
-      <ClassHistoryTable classNo={name} />
+      <Suspense fallback={<ClassHistoryTableSkeleton/>}>
+        <ClassHistoryTable classNo={name} />
+      </Suspense>
     </div>
   );
 }
