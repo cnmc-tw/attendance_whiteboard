@@ -3,6 +3,7 @@ DROP INDEX IF EXISTS attendance.reports_date_class_submitted_idx;
 CREATE INDEX reports_date_class_submitted_idx 
 ON attendance.reports USING btree (report_date, class, submitted_at DESC);
 
+DROP view IF EXISTS attendance.latest_reports_per_class;
 CREATE VIEW attendance.latest_reports_per_class AS
 SELECT DISTINCT ON (class) *
 FROM attendance.reports
