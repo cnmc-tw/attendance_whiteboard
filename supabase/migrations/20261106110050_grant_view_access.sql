@@ -1,0 +1,1 @@
+GRANT SELECT ON attendance.latest_reports_per_class TO authenticated;
