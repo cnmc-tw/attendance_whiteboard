@@ -2,12 +2,12 @@ import { Report, GetClassHistoryQuery, ClassHistoryResult } from "./types";
 
 export interface ReportRepository {
 
-    getByDateAndClass(
+    getLatestByDateAndClass(
         date: string,
         classNo: string
-    ): Promise<Report[]>;
+    ): Promise<Report | null>;
 
-    getByDate(date: string): Promise<Report[]>;
+    getLatestReportsByDate(date: string): Promise<Report[]>;
 
     getClassHistory(
         query: GetClassHistoryQuery,

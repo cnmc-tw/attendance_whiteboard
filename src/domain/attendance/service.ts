@@ -15,7 +15,7 @@ export interface ReportItem {
     other: number;
 
     absentCount: number;
-    
+
     status: ReportState;
     report_date: string;
     submitted_by: string;
@@ -28,7 +28,7 @@ export interface ReportService {
 
     getReportsByDate(date: Date): Promise<ReportItem[]>;
 
-    getLeastReportByClass(classNo: string, now: Date): Promise<Report| null>;
+    getLeastReportByClass(classNo: string, now: Date): Promise<Report | null>;
 
     // getTodayReportsByClass(classNo: string, now: Date): Promise<ReportItem[]>;
 
@@ -51,32 +51,15 @@ class DefaultReportService
 
     constructor(
         private readonly repository: ReportRepository
-    ) {}
+    ) { }
 
+    // service
     async getReportsByDate(date: Date): Promise<ReportItem[]> {
-        const reports = await this.repository.getByDate(
+        const latestReports = await this.repository.getLatestReportsByDate(
             AppTime.date(date)
         );
 
-        const reportMap = new Map<string, Report>();
-
-        reports.forEach((report) => {
-            const existingReport = reportMap.get(report.class);
-
-            if (!existingReport) {
-                reportMap.set(report.class, report);
-                return;
-            }
-
-            if (existingReport.submitted_at < report.submitted_at) {
-                reportMap.set(report.class, report);
-            }
-        });
-
-        const latestReports = Array.from(reportMap.values());
-
-        latestReports.sort((a, b) => +a.class - +b.class);
-
+        // 2. 轉換資料格式
         return latestReports.map((report) => ({
             id: report.id,
             class: report.class,
@@ -88,7 +71,7 @@ class DefaultReportService
             other: report.payload.other?.length ?? 0,
 
             absentCount: Object.values(report.payload)
-                .reduce((acc, arr) => acc + arr.length, 0),
+                .reduce((acc, arr) => acc + (arr?.length ?? 0), 0),
 
             status: "reported",
             report_date: report.report_date,
@@ -96,25 +79,12 @@ class DefaultReportService
             submitted_at: report.submitted_at,
         }));
     }
-
+    
     async getLeastReportByClass(classNo: string, now: Date): Promise<Report | null> {
-        const reports = await this.repository.getByDateAndClass(
-            now.toLocaleDateString("en-CA"),
+        return await this.repository.getLatestByDateAndClass(
+            AppTime.date(now),
             classNo
         );
-
-        // 1. 依照 submitted_at 降冪排序（最新最前面）
-        const sortedReports = reports
-            .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime());
-
-        const latestReport = sortedReports[0];
-
-        // 若查無資料，回傳 null（或視需求改為 throw Error / 回傳 default 物件）
-        if (!latestReport) {
-            return null;
-        }
-
-        return latestReport
     }
 
     async getClassHistory(

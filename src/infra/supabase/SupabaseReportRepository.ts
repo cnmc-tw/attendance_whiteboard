@@ -14,7 +14,7 @@ export class SupabaseReportRepository
 
     constructor(
         protected readonly client: SupabaseClient,
-    ) {}
+    ) { }
 
     private from() {
         return this.client
@@ -36,41 +36,35 @@ export class SupabaseReportRepository
         ].includes(value as ReportSubmissionErrorCode);
     }
 
-    async getByDateAndClass(
+    async getLatestByDateAndClass(
         date: string,
         classNo: string
-    ): Promise<Report[]> {
-
+    ): Promise<Report | null> {
         const { data, error } = await this.from()
             .select("*")
             .eq("report_date", date)
-            .eq("class", classNo);
+            .eq("class", classNo)
+            .order("submitted_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        if (error) {
-            throw error;
-        }
-
-        if (!data) {
-            return [];
-        }
-
-        return data as Report[];
+        if (error) throw error;
+        return data as Report | null;
     }
 
-    async getByDate(date: string): Promise<Report[]> {
-        const { data, error } = await this.from()
+    async getLatestReportsByDate(date: string): Promise<Report[]> {
+        const { data, error } = await this.client
+            .schema("attendance")
+            .from("attendance.latest_reports_per_class")
             .select("*")
-            .eq("report_date", date);
+            .eq("report_date", date)
+
 
         if (error) {
             throw error;
         }
 
-        if (!data) {
-            return [];
-        }
-
-        return data as Report[];
+        return (data as Report[]) ?? [];
     }
 
 
