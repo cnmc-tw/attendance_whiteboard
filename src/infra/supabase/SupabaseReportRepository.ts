@@ -54,6 +54,7 @@ export class SupabaseReportRepository
 
     async getLatestReportsByDate(date: string): Promise<Report[]> {
         const { data, error } = await this.client
+            .schema("attendance")
             .from("latest_reports_per_class")
             .select("*")
             .eq("report_date", date)
